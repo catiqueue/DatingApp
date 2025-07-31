@@ -1,0 +1,78 @@
+# Remove the line below if you want to inherit .editorconfig settings from higher directories
+root = true
+
+# C# files
+[*.cs]
+
+#### Core EditorConfig Options ####
+
+# Indentation and spacing
+indent_size = 2
+indent_style = space
+tab_width = 2
+
+# New line preferences
+end_of_line = crlf
+insert_final_newline = true
+
+#### .NET Coding Conventions ####
+
+# Organize usings
+dotnet_separate_import_directive_groups = true
+dotnet_sort_system_directives_first = true
+
+# Field preferences
+dotnet_style_readonly_field = true
+
+#### C# Coding Conventions ####
+
+# var preferences
+csharp_style_var_when_type_is_apparent = true
+
+# Expression-bodied members
+csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_constructors = true
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_lambdas = true
+csharp_style_expression_bodied_local_functions = true
+csharp_style_expression_bodied_methods = true
+csharp_style_expression_bodied_operators = true
+csharp_style_expression_bodied_properties = true
+
+# Pattern matching preferences
+csharp_style_pattern_matching_over_as_with_null_check = true
+csharp_style_pattern_matching_over_is_with_cast_check = true
+csharp_style_prefer_extended_property_pattern = true
+csharp_style_prefer_not_pattern = true
+csharp_style_prefer_pattern_matching = true
+csharp_style_prefer_switch_expression = true
+
+# Code-block preferences
+csharp_prefer_braces = false
+csharp_prefer_simple_using_statement = true
+csharp_style_namespace_declarations = block_scoped
+csharp_style_prefer_method_group_conversion = true
+csharp_style_prefer_primary_constructors = true
+csharp_style_prefer_top_level_statements = true
+
+# 'using' directive preferences
+csharp_using_directive_placement = outside_namespace
+
+#### C# Formatting Rules ####
+
+# New line preferences
+csharp_new_line_before_catch = false
+csharp_new_line_before_else = false
+csharp_new_line_before_finally = false
+csharp_new_line_before_members_in_anonymous_types = false
+csharp_new_line_before_members_in_object_initializers = false
+csharp_new_line_before_open_brace = never
+csharp_new_line_between_query_expression_clauses = true
+
+# Indentation preferences
+csharp_indent_block_contents = true
+csharp_indent_braces = false
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = true
+csharp_indent_labels = one_less_than_current
+csharp_indent_switch_labels = true
