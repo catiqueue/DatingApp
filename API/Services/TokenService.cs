@@ -1,0 +1,42 @@
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+
+using API.Entities;
+using API.Extensions.Configuration;
+
+using Microsoft.IdentityModel.Tokens;
+
+namespace API.Services;
+
+public interface ITokenService {
+  string CreateToken(AppUser user); 
+}
+
+public class TokenService(IConfiguration config) : ITokenService {
+  private const string TokenKeySelector = "TokenKey";
+  public string CreateToken(AppUser user) {
+    var tokenKey = config.GetJwtSymmetricalKey();
+    
+    var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
+    
+    Claim[] claims = [
+      // ReSharper disable once ArrangeObjectCreationWhenTypeNotEvident // Stupid machine
+      new (ClaimTypes.Name, user.Username)
+    ];
+    
+    var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+
+    var descriptor = new SecurityTokenDescriptor {
+      Subject = new ClaimsIdentity(claims),
+      Expires = DateTime.UtcNow.AddDays(7),
+      SigningCredentials = credentials
+    };
+
+    // This stupid fucking thing annoys me as hell.
+    // Why am I creating a "token", then the method, that says "WRITE" - RETURNS the token (token again), CONSUMING the token??
+    var tokenHandler = new JwtSecurityTokenHandler();
+    var token = tokenHandler.CreateToken(descriptor);
+    return tokenHandler.WriteToken(token);
+  }
+}
