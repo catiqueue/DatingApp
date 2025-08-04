@@ -1,23 +1,31 @@
-import { NgFor } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Nav } from "./nav/nav";
+import { AccountService } from './_services/account-service';
+import { SimpleUser } from './_models/simple-user';
+import { LoggedInUser } from './_models/logged-in-user';
+import { Home } from "./home/home";
 
 @Component({
   selector: 'app-root',
-  imports: [],
+  imports: [Nav, Home],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit {
   protected readonly title = signal('DatingApp');
+  private accountService = inject(AccountService);
   http = inject(HttpClient);
-  users: any;
+
 
   ngOnInit(): void {
-    this.http.get('https://localhost:5001/api/users/all').subscribe({
-      next: (r) => this.users = r,
-      error: (e) => console.error(e),
-      complete: () => console.info('got all users')});
+    this.setCurrentUser();
+  }
+
+  setCurrentUser(): void {
+    var userString = localStorage.getItem("user");
+    if(!userString) return;
+    var user:LoggedInUser = JSON.parse(userString);
+    this.accountService.currentUser.set(user);
   }
 }
