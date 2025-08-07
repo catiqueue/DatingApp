@@ -2,13 +2,12 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Nav } from "./nav/nav";
 import { AccountService } from './_services/account-service';
-import { SimpleUser } from './_models/simple-user';
 import { LoggedInUser } from './_models/logged-in-user';
-import { Home } from "./home/home";
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [Nav, Home],
+  imports: [RouterOutlet, Nav],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

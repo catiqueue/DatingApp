@@ -3,7 +3,11 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
-# secrets
+# Sqlite-related stuff
+API/*.db-shm
+API/*.db-wal
+
+# Secrets
 .env
 appsettings.json
 

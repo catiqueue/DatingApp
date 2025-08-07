@@ -3,16 +3,20 @@ import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account-service';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { LoginForm } from '../_models/login-form';
-import { App } from '../app';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { TitleCasePipe } from '@angular/common';
 
 @Component({
   selector: 'app-nav',
-  imports: [FormsModule, BsDropdownModule],
+  imports: [RouterLink, RouterLinkActive, FormsModule, BsDropdownModule, TitleCasePipe],
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })
 export class Nav {
   accountService = inject(AccountService);
+  private router = inject(Router);
+  private toastr = inject(ToastrService);
   loginFormModel: LoginForm = {
     "password":"",
     "username":""
@@ -21,15 +25,17 @@ export class Nav {
   login() {
     if(!this.loginFormModel) return;
     this.accountService.login(this.loginFormModel).subscribe({
-      next: response => {
-        console.log(response);
+      next: _ => {
+        this.router.navigateByUrl("/members");
       },
+      // едет error через error, видит error в error error. сунул error error в error, error error error error
       error: error => {
-        console.error(error);
+        this.toastr.error(error.error);
       }
     });
   }
   logout() {
     this.accountService.logout();
+    this.router.navigateByUrl("/");
   }
 }
