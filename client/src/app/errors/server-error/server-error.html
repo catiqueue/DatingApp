@@ -1,0 +1,14 @@
+<h4>Internal Server Error</h4>
+@if(error) {
+  <h5 class="text-danger">Error: {{error.message}}</h5>
+  <p class="font-weight-bold">Note: if You are seeing this error, then the API server has done something stupid again.</p>
+  <p>What to do next? </p>
+  <ol>
+    <li>Open Chrome dev tools and check the failed request in the Network tab.</li>
+    <li>Examine the URL of the failing request.</li>
+    <li>Reproduce the error in Postman.</li>
+    <li>Tell me about it.</li>
+  </ol>
+  <p class="font-weight-bold">The following block of text is the stack trace, which can be useful: </p>
+  <code class="mt-5">{{error.details}}</code>
+}
