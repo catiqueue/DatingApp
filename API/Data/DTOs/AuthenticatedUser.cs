@@ -1,4 +1,3 @@
-﻿// Weird naming, but will do for now
-namespace API.Data.DTObjects;
+﻿namespace API.Data.DTOs;
 
 public sealed record AuthenticatedUser(string Username, string Token);

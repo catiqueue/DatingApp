@@ -10,12 +10,12 @@ using Microsoft.IdentityModel.Tokens;
 namespace API.Services;
 
 public interface ITokenService {
-  string CreateToken(AppUser user); 
+  string CreateToken(DbUser user); 
 }
 
 public class TokenService(IConfiguration config) : ITokenService {
   private const string TokenKeySelector = "TokenKey";
-  public string CreateToken(AppUser user) {
+  public string CreateToken(DbUser user) {
     var tokenKey = config.GetJwtSymmetricalKey();
     
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));

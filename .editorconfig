@@ -1,5 +1,5 @@
-# Remove the line below if you want to inherit .editorconfig settings from higher directories
 root = true
+# Remove the line below if you want to inherit .editorconfig settings from higher directories
 
 # C# files
 [*.cs]
@@ -50,7 +50,7 @@ csharp_style_prefer_switch_expression = true
 # Code-block preferences
 csharp_prefer_braces = false
 csharp_prefer_simple_using_statement = true
-csharp_style_namespace_declarations = file_scoped
+csharp_style_namespace_declarations = file_scoped:error
 csharp_style_prefer_method_group_conversion = true
 csharp_style_prefer_primary_constructors = true
 csharp_style_prefer_top_level_statements = true

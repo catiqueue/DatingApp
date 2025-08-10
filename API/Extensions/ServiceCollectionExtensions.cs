@@ -1,7 +1,9 @@
 ﻿using System.Text;
 
 using API.Data;
+using API.Data.Repositories;
 using API.Extensions.Configuration;
+using API.Helpers;
 using API.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,16 +18,21 @@ public static class ServiceCollectionExtensions {
       .AddCors()
       .AddControllers().Services
       .AddDefaultJwtTokenService()
+      .AddUserRepository()
+      .AddAutoMapper(typeof(Program).Assembly)
       .AddDefaultJwtAuthentication(configuration);
-  
-  public static IServiceCollection AddSqliteDbContext(this IServiceCollection services, IConfiguration configuration)
+
+  private static IServiceCollection AddSqliteDbContext(this IServiceCollection services, IConfiguration configuration)
     => services.AddDbContext<DataContext>(options =>
       options.UseSqlite(configuration.GetSqliteConnectionString()));
 
-  public static IServiceCollection AddDefaultJwtTokenService(this IServiceCollection services)
+  private static IServiceCollection AddDefaultJwtTokenService(this IServiceCollection services)
     => services.AddScoped<ITokenService, TokenService>();
+  
+  private static IServiceCollection AddUserRepository(this IServiceCollection services)
+    => services.AddScoped<IUserRepository, UserRepository>();
 
-  public static IServiceCollection AddDefaultJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+  private static IServiceCollection AddDefaultJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
        .AddJwtBearer(options => {
          var tokenKey = configuration.GetJwtSymmetricalKey();

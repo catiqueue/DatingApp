@@ -1,5 +1,11 @@
-﻿using API.Data;
+﻿using System.Collections;
+
+using API.Data;
+using API.Data.DTOs;
+using API.Data.Repositories;
 using API.Entities;
+
+using AutoMapper;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -8,17 +14,22 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers;
 
 [Authorize]
-public class UsersController(DataContext db) : ApiControllerBase {
+public class UsersController(IUserRepository users) : ApiControllerBase {
     
   [HttpGet("all")]
-  public async Task<ActionResult<IEnumerable<AppUser>>> GetUsers() {
-    return Ok(await db.Users.ToListAsync());
-  }
-    
-  [HttpGet("{id}")] 
-  public async Task<ActionResult<AppUser>> GetUser(uint id) {
-    var user = await db.Users.FindAsync(id);
+  public async Task<ActionResult<IEnumerable<SimpleUser>>> GetUsers() 
+    => Ok(await users.GetSimpleUsersAsync());
+
+  [HttpGet("{id:int}")] 
+  public async Task<ActionResult<SimpleUser>> GetUser(uint id) {
+    var user = await users.GetDbUserAsync(id);
     if(user == null) return NotFound();
-    return Ok(user);
+    return Ok(await users.GetSimpleUserAsync(id));
+  }
+  
+  [HttpGet("{username}")] 
+  public async Task<ActionResult<SimpleUser>> GetUser(string username) {
+    var user = await users.GetDbUserAsync(username);
+    return user == null ? NotFound() : Ok(await users.GetSimpleUserAsync(username));
   }
 }
