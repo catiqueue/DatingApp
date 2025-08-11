@@ -1,14 +1,6 @@
 <div class="container mt-5">
   <div style="text-align: center;">
 
-  <ul>
-    @for(user of users(); track user.id) {
-      <li> {{user.username}} </li>
-    } @empty {
-      <li>There are no users.</li>
-    }
-  </ul>
-
   @if(registerMode) {
     <h1>Find your match!</h1>
     <p class="lead">Come on in to view your matches. Just sign up to get started!</p>

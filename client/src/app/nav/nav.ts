@@ -26,7 +26,7 @@ export class Nav {
     if(!this.loginFormModel) return;
     this.accountService.login(this.loginFormModel).subscribe({
       next: _ => {
-        this.router.navigateByUrl("/members");
+        this.router.navigateByUrl("/users");
       },
       // едет error через error, видит error в error error. сунул error error в error, error error error error
       error: error => {
