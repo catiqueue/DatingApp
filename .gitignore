@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# vscode
+.vscode/
+
 # Sqlite-related stuff
 API/*.db-shm
 API/*.db-wal
