@@ -4,10 +4,12 @@ import { UserList } from './users/user-list/user-list';
 import { UserDetail } from './users/user-detail/user-detail';
 import { Lists } from './lists/lists';
 import { Messages } from './messages/messages';
-import { authGuard } from './_guards/auth.guard';
+import { authGuard } from './_guards/auth-guard';
 import { TestErrors } from './errors/test-errors/test-errors';
 import { NotFound } from './errors/not-found/not-found';
 import { ServerError } from './errors/server-error/server-error';
+import { UserEdit } from './users/user-edit/user-edit';
+import { preventLosingChangesGuard } from './_guards/prevent-losing-changes-guard';
 
 export const routes: Routes = [
   {path: "", component: Home},
@@ -18,6 +20,7 @@ export const routes: Routes = [
     children: [
       {path: "users", component: UserList},
       {path: "users/:username", component: UserDetail},
+      {path: "user/edit", component: UserEdit, canDeactivate: [preventLosingChangesGuard]},
       {path: "lists", component: Lists},
       {path: "messages", component: Messages},
     ]
