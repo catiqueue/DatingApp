@@ -1,6 +1,4 @@
-﻿using API.Extensions;
-
-namespace API.Entities;
+﻿namespace API.Entities;
 
 public sealed class DbUser {
   public uint Id { get; set; }

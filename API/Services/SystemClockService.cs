@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace API.Services;
+﻿namespace API.Services;
 
 public interface ISystemClockService { 
   DateTime Now { get; }

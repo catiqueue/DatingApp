@@ -22,7 +22,7 @@ public class TokenService(IConfiguration config) : ITokenService {
     
     Claim[] claims = [
       // ReSharper disable once ArrangeObjectCreationWhenTypeNotEvident // Stupid machine
-      new (ClaimTypes.Name, user.Username)
+      new (JwtRegisteredClaimNames.Nickname, user.Username)
     ];
     
     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
@@ -33,8 +33,7 @@ public class TokenService(IConfiguration config) : ITokenService {
       SigningCredentials = credentials
     };
 
-    // This stupid fucking thing annoys me as hell.
-    // Why am I creating a "token", then the method, that says "WRITE" - RETURNS the token (token again), CONSUMING the token??
+    // Shut up
     var tokenHandler = new JwtSecurityTokenHandler();
     var token = tokenHandler.CreateToken(descriptor);
     return tokenHandler.WriteToken(token);

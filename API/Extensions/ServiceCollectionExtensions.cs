@@ -3,7 +3,6 @@
 using API.Data;
 using API.Data.Repositories;
 using API.Extensions.Configuration;
-using API.Helpers;
 using API.Services;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
