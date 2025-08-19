@@ -35,7 +35,7 @@ export class Nav {
     });
   }
   logout() {
-    this.accountService.logout();
+    this.accountService.unsetCurrentUser();
     this.router.navigateByUrl("/");
   }
 }

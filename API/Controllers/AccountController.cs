@@ -4,19 +4,21 @@ using System.Text;
 
 using API.Data;
 using API.Data.DTOs;
+using API.Data.Repositories;
 using API.Data.Requests;
 using API.Entities;
 using API.Services;
+using API.Services.Abstractions;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace API.Controllers;
 
-public sealed class AccountController(DataContext db, ITokenService tokenSvc) : ApiControllerBase {
+public sealed class AccountController(IUserRepository users, ITokenService tokenSvc) : ApiControllerBase {
   [HttpPost("register")]
   public async Task<ActionResult<AuthenticatedUser>> Handle(RegisterRequest request) {
-    if (await UserExistsAsync(request.Username)) return BadRequest("The username is already taken.");
+    if (await users.UserExistsAsync(request.Username)) return BadRequest("The username is already taken.");
     return Ok("Under construction.");
     
     // Postponed for now
@@ -38,7 +40,7 @@ public sealed class AccountController(DataContext db, ITokenService tokenSvc) : 
   
   [HttpPost("login")]
   public async Task<ActionResult<AuthenticatedUser>> Handle(LoginRequest request) {
-    var user = await GetUserAsync(request.Username);
+    var user = await users.GetDbUserAsync(request.Username);
     if (user == null) return Unauthorized("The username was not found.");
     
     using var encoder = new HMACSHA512(Convert.FromBase64String(user.Base64PasswordSalt));
@@ -47,10 +49,6 @@ public sealed class AccountController(DataContext db, ITokenService tokenSvc) : 
     var passwordHash = Convert.ToBase64String(encoder.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
     if (passwordHash != user.Base64PasswordHash) return Unauthorized("The password was incorrect.");
     
-    return Ok(new AuthenticatedUser(user.Username, tokenSvc.CreateToken(user)));
+    return Ok(new AuthenticatedUser(user.Username, tokenSvc.CreateToken(user), user.Photos.FirstOrDefault(x => x.IsMain)?.Url));
   }
-  
-  private async Task<DbUser?> GetUserAsync(string username) => await db.Users.FirstOrDefaultAsync(u => u.Username.ToLower() == username.ToLower());
-  [SuppressMessage("Performance", "CA1862:Use the \'StringComparison\' method overloads to perform case-insensitive string comparisons")]
-  private async Task<bool> UserExistsAsync(string username) => await db.Users.AnyAsync(u => u.Username.ToLower() == username.ToLower());
 }

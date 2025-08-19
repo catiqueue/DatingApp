@@ -13,7 +13,7 @@ export class LoadingService {
     this.spinnerService.show(undefined, {
       type: "cube-transition",
       bdColor: "rgba(255, 255, 255, 0)",
-      color: "#333333"
+      color: "#333333",
     })
   }
 

@@ -11,4 +11,7 @@ public static class ConfigurationExtensions {
   public static string GetSqliteConnectionString(this IConfiguration configuration) 
     => configuration.GetSection(Selectors.SqliteConnectionSelector).Value 
        ?? throw new InvalidOperationException($"Missing configuration value: {Selectors.SqliteConnectionSelector}");
+  
+  public static IConfigurationSection GetCloudinarySection(this IConfiguration configuration) 
+    => configuration.GetSection(Selectors.CloudinarySettingsSelector);
 }

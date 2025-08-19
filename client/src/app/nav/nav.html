@@ -20,6 +20,8 @@
 
       @if (accountService.currentUser()) {
         <div dropdown class="dropdown">
+          <img src="{{accountService.currentUser()?.avatarUrl || 'assets/user.png'}}"
+               alt="user's main image" class="me-2">
           <a dropdownToggle class="dropdown-toggle text-light text-decoration-none">Welcome, {{accountService.currentUser()?.username | titlecase}}</a>
           <div *dropdownMenu class="dropdown-menu">
             <a class="dropdown-item" routerLink="/user/edit">Edit profile</a>

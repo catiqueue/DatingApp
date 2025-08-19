@@ -5,11 +5,12 @@ import { UsersService } from '../../_services/users-service';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { PhotoEditor } from "../photo-editor/photo-editor";
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
-  imports: [TabsModule, FormsModule],
+  imports: [TabsModule, FormsModule, PhotoEditor],
   templateUrl: './user-edit.html',
   styleUrl: './user-edit.css'
 })
@@ -44,5 +45,9 @@ export class UserEdit implements OnInit {
         this.toaster.success("Profile updated!");
       }
     });
+  }
+
+  onUserUpdated(updated: User) {
+    this.user = updated;
   }
 }

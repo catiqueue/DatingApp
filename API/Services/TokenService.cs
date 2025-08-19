@@ -4,14 +4,11 @@ using System.Text;
 
 using API.Entities;
 using API.Extensions.Configuration;
+using API.Services.Abstractions;
 
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
-
-public interface ITokenService {
-  string CreateToken(DbUser user); 
-}
 
 public class TokenService(IConfiguration config) : ITokenService {
   private const string TokenKeySelector = "TokenKey";

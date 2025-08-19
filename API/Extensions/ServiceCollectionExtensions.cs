@@ -4,6 +4,8 @@ using API.Data;
 using API.Data.Repositories;
 using API.Extensions.Configuration;
 using API.Services;
+using API.Services.Abstractions;
+using API.Services.Abstractions.PhotoService;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +21,8 @@ public static class ServiceCollectionExtensions {
       .AddDefaultJwtTokenService()
       .AddUserRepository()
       .AddAutoMapper(typeof(Program).Assembly)
+      .ConfigureCloudinary(configuration)
+      .AddCloudinaryPhotoService()
       .AddDefaultJwtAuthentication(configuration);
 
   private static IServiceCollection AddSqliteDbContext(this IServiceCollection services, IConfiguration configuration)
@@ -30,6 +34,12 @@ public static class ServiceCollectionExtensions {
   
   private static IServiceCollection AddUserRepository(this IServiceCollection services)
     => services.AddScoped<IUserRepository, UserRepository>();
+  
+  private static IServiceCollection ConfigureCloudinary(this IServiceCollection services, IConfiguration configuration) 
+    => services.Configure<CloudinaryOptions>(configuration.GetCloudinarySection());
+  
+  private static IServiceCollection AddCloudinaryPhotoService(this IServiceCollection services) 
+    => services.AddScoped<IPhotoService, CloudinaryPhotoService>();
 
   private static IServiceCollection AddDefaultJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

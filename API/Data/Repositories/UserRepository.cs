@@ -14,6 +14,9 @@ public interface IUserRepository {
   Task<IEnumerable<DbUser>> GetDbUsersAsync();
   Task<DbUser?> GetDbUserAsync(uint id);
   Task<DbUser?> GetDbUserAsync(string username);
+  
+  Task<bool> UserExistsAsync(string username);
+  Task<bool> UserExistsAsync(uint id);
 
   Task<IEnumerable<SimpleUser>> GetSimpleUsersAsync();
   Task<SimpleUser?> GetSimpleUserAsync(uint id);
@@ -33,6 +36,12 @@ public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
   
   public async Task<DbUser?> GetDbUserAsync(string username) 
     => await db.Users.Include(u => u.Photos).SingleOrDefaultAsync(user => user.Username == username.ToLower());
+  
+  public async Task<bool> UserExistsAsync(string username) 
+    => await db.Users.AnyAsync(user => user.Username == username.ToLower());
+  
+  public async Task<bool> UserExistsAsync(uint id) 
+    => await db.Users.AnyAsync(user => user.Id == id);
 
   public async Task<IEnumerable<SimpleUser>> GetSimpleUsersAsync()
     => await db.Users.ProjectTo<SimpleUser>(mapper.ConfigurationProvider).ToListAsync();

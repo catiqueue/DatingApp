@@ -1,8 +1,6 @@
-﻿namespace API.Services;
+﻿using API.Services.Abstractions;
 
-public interface ISystemClockService { 
-  DateTime Now { get; }
-}
+namespace API.Services;
 
 public class SystemClockService : ISystemClockService {
   public DateTime Now => DateTime.UtcNow;
