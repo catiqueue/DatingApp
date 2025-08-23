@@ -56,6 +56,8 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
       PublicId = result.Value.PublicId,
     };
     
+    if(user.Photos.Count == 0) photo.IsMain = true;
+    
     user.Photos.Add(photo);
 
     return await users.TrySaveAllAsync() 

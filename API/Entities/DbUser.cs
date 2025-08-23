@@ -15,5 +15,5 @@ public sealed class DbUser {
   public string? LookingFor { get; set; }
   public required string City { get; set; }
   public required string Country { get; set; }
-  public List<DbPhoto> Photos { get; set; } = new();
+  public List<DbPhoto> Photos { get; set; } = [];
 }

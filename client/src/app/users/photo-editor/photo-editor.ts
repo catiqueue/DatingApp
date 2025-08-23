@@ -38,10 +38,7 @@ export class PhotoEditor implements OnInit {
     this.usersService.setMainPhoto(photo).subscribe({
       next: () => {
         // this feels so stupid
-        var loggedInUser = this.accountService.currentUser();
-        if(!loggedInUser) return;
-        loggedInUser.avatarUrl = photo.url;
-        this.accountService.setCurrentUser(loggedInUser);
+        this.accountService.setAvatar(photo);
 
         var updatedUser =  {...this.user()}
         updatedUser.avatarUrl = photo.url;
@@ -80,9 +77,13 @@ export class PhotoEditor implements OnInit {
       file.withCredentials = false;
     }
     this.uploader.onSuccessItem = (file, response, status, headers) => {
-      var photo = JSON.parse(response);
+      var photo = JSON.parse(response) as Photo;
       var updatedUser = {...this.user()};
       updatedUser.photos.push(photo);
+      if(photo.isMain) {
+        this.accountService.setAvatar(photo);
+        updatedUser.avatarUrl = photo.url;
+      }
       this.userUpdated.emit(updatedUser);
     }
   }

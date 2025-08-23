@@ -1,13 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using API.Entities;
+
 namespace API.Data.Requests;
 
 public sealed record RegisterRequest(
-  [Required] 
-  // [MinLength(3)] [MaxLength(24)]
-  [StringLength(maximumLength: 24, MinimumLength = 3)]
-  string Username = "",
   [Required]
-  // [MinLength(12)] [MaxLength(64)]
-  [StringLength(maximumLength: 64, MinimumLength = 12)]
-  string Password = "");
+  [StringLengthRange(3, 24)]
+  string Username,
+  [Required]
+  string KnownAs,
+  [Required]
+  UserGender Gender,
+  [Required]
+  DateOnly DateOfBirth,
+  [Required]
+  string Country,
+  [Required]
+  string City,
+  [Required]
+  [StringLengthRange(8, 64)]
+  string Password);
+
+
+// I'll move this maybe if it's useful
+internal class StringLengthRangeAttribute : StringLengthAttribute {
+  public StringLengthRangeAttribute(int minimumLength, int maximumLength) : base(maximumLength) {
+    MinimumLength = minimumLength;
+  }
+}

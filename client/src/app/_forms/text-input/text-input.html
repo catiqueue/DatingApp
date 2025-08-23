@@ -1,0 +1,17 @@
+  <div class="mb-3 form-floating">
+    <input [type]="type()" class="form-control" [formControl]="control" placeholder={{label()}}
+    [class]="{'is-invalid': control.touched && control.invalid}">
+    <label>{{label()}}</label>
+    @if(control.hasError("required")) {
+      <div class="invalid-feedback">Please enter a valid {{label()}}</div>
+    }
+    @if(control.hasError("minlength")) {
+      <div class="invalid-feedback">The {{label()}} must be at least {{control.errors?.["minlength"].requiredLength}} characters long</div>
+    }
+    @if(control.hasError("maxlength")) {
+      <div class="invalid-feedback">The {{label()}} must be at most {{control.errors?.["maxlength"].requiredLength}} characters long</div>
+    }
+    @if(control.hasError("ismatching")) {
+      <div class="invalid-feedback">Passwords do not match</div>
+    }
+  </div>

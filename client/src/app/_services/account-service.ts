@@ -4,6 +4,7 @@ import { LoggedInUser } from '../_models/logged-in-user';
 import { LoginForm } from '../_models/login-form';
 import { map } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { Photo } from '../_models/photo';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +23,7 @@ export class AccountService {
     ));
   }
 
-  register(model: LoginForm) {
+  register(model: any) {
     return this.http.post<LoggedInUser>(this.baseUrl + "/account/register", model).pipe(map(
       user => {
         if(user) this.setCurrentUser(user)
@@ -34,6 +35,13 @@ export class AccountService {
   setCurrentUser(user: LoggedInUser) {
     localStorage.setItem("user", JSON.stringify(user));
     this.currentUser.set(user);
+  }
+
+  setAvatar(photo: Photo) {
+    if(!this.currentUser()) return;
+    var updated = {...this.currentUser()!};
+    updated.avatarUrl = photo.url;
+    this.setCurrentUser(updated);
   }
 
   unsetCurrentUser() {

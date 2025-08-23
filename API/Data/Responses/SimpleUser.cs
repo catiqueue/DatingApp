@@ -3,6 +3,7 @@ using API.Extensions;
 
 namespace API.Data.DTOs;
 
+// This is kind of stupid
 public class SimpleUser {
   public uint Id { get; init; }
   public string Username { get; init; } = "";
