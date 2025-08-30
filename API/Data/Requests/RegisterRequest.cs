@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 using API.Entities;
+using API.Helpers;
 
 namespace API.Data.Requests;
 
@@ -21,11 +22,3 @@ public sealed record RegisterRequest(
   [Required]
   [StringLengthRange(8, 64)]
   string Password);
-
-
-// I'll move this maybe if it's useful
-internal class StringLengthRangeAttribute : StringLengthAttribute {
-  public StringLengthRangeAttribute(int minimumLength, int maximumLength) : base(maximumLength) {
-    MinimumLength = minimumLength;
-  }
-}

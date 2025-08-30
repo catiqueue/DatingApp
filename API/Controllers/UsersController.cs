@@ -1,24 +1,29 @@
 ﻿using API.Data.DTOs;
-using API.Data.Repositories;
 using API.Data.Requests;
+using API.Data.Responses;
 using API.Entities;
 using API.Extensions;
+using API.Helpers;
+using API.Services.Abstractions;
 using API.Services.Abstractions.PhotoService;
 
 using AutoMapper;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace API.Controllers;
 
 [Authorize]
 public class UsersController(IUserRepository users, IMapper mapper, IPhotoService photoService) : ApiControllerBase {
-    
-  [HttpGet("all")]
-  public async Task<ActionResult<IEnumerable<SimpleUser>>> GetUsers() 
-    => Ok(await users.GetSimpleUsersAsync());
+
+  [HttpGet]
+  public async Task<ActionResult<PaginatedResponse<SimpleUser>>> GetUsers([FromQuery] GetUsersRequest request) =>
+    PaginationInfo.TryCreate(request.ToPage(), await users.CountAsync(request.ToFilter(User.GetUsername())), out var paginationInfo)
+      ? Ok(PaginatedResponse<SimpleUser>.FromPaginationInfo(
+        paginationInfo, 
+        await users.GetSimpleUsersAsync(paginationInfo.Page, request.ToFilter(User.GetUsername()), request.OrderBy)))
+      : BadRequest($"Page {request.Page} does not exist.");
 
   [HttpGet("{id:int}")] 
   public async Task<ActionResult<SimpleUser>> GetUser(uint id) {

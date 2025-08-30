@@ -1,10 +1,12 @@
-﻿using API.Entities;
+﻿using API.Data.DTOs;
+using API.Entities;
 using API.Extensions;
+using API.Helpers;
 
-namespace API.Data.DTOs;
+namespace API.Data.Responses;
 
 // This is kind of stupid
-public class SimpleUser {
+public class SimpleUser : IFilterableUser, ISortableUser {
   public uint Id { get; init; }
   public string Username { get; init; } = "";
   public DateOnly DateOfBirth { get; init; }

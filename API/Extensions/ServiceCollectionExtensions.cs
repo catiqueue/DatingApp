@@ -3,6 +3,7 @@
 using API.Data;
 using API.Data.Repositories;
 using API.Extensions.Configuration;
+using API.Helpers;
 using API.Services;
 using API.Services.Abstractions;
 using API.Services.Abstractions.PhotoService;
@@ -23,6 +24,7 @@ public static class ServiceCollectionExtensions {
       .AddAutoMapper(typeof(Program).Assembly)
       .ConfigureCloudinary(configuration)
       .AddCloudinaryPhotoService()
+      .AddUserActivityTracker()
       .AddDefaultJwtAuthentication(configuration);
 
   private static IServiceCollection AddSqliteDbContext(this IServiceCollection services, IConfiguration configuration)
@@ -40,6 +42,9 @@ public static class ServiceCollectionExtensions {
   
   private static IServiceCollection AddCloudinaryPhotoService(this IServiceCollection services) 
     => services.AddScoped<IPhotoService, CloudinaryPhotoService>();
+
+  private static IServiceCollection AddUserActivityTracker(this IServiceCollection services)
+    => services.AddScoped<UserActivityTracker>();
 
   private static IServiceCollection AddDefaultJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

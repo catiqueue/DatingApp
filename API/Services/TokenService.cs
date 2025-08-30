@@ -18,8 +18,10 @@ public class TokenService(IConfiguration config) : ITokenService {
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
     
     Claim[] claims = [
-      // ReSharper disable once ArrangeObjectCreationWhenTypeNotEvident // Stupid machine
-      new (JwtRegisteredClaimNames.Nickname, user.Username)
+      // ReSharper disable ArrangeObjectCreationWhenTypeNotEvident // Stupid machine
+      new("nickname", user.Username),
+      new("id", user.Id.ToString())
+      // ReSharper restore ArrangeObjectCreationWhenTypeNotEvident
     ];
     
     var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);

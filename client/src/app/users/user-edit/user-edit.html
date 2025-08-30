@@ -1,4 +1,4 @@
-@if(user) {
+@if(user()) {
   <div class="row">
     <div class="col-4">
       <h1>Your profile</h1>
@@ -13,19 +13,19 @@
     <div class="col-4">
       <div class="card">
         <img
-        src="{{user.avatarUrl || './assets/user.png'}}"
-        alt="{{user.knownAs}}"
+        src="{{user()!.avatarUrl || './assets/user.png'}}"
+        alt="{{user()!.knownAs}}"
         class="card-img img-thumbnail">
         <div class="card-body">
           <div>
             <strong>Location:</strong>
-            <p>{{user.city}}, {{user.country}}</p>
+            <p>{{user()!.city}}, {{user()!.country}}</p>
             <strong>Age:</strong>
-            <p>{{user.age}}</p>
+            <p>{{user()!.age}}</p>
             <strong>Last active:</strong>
-            <p>{{user.lastActive}}</p>
+            <p>{{user()!.lastActive | timeago}}</p>
             <strong>A user since:</strong>
-            <p>{{user.createdAt}}</p>
+            <p>{{user()!.createdAt | date: "dd MMM yyyy"}}</p>
           </div>
         </div>
         <div class="card-footer">
@@ -36,26 +36,26 @@
 
     <div class="col-8">
       <tabset class="user-tabset">
-        <tab heading="About {{user.knownAs}}">
+        <tab heading="About {{user()!.knownAs}}">
           <form id="editForm" #editForm="ngForm" (ngSubmit)="updateUser()">
             <h4 class="mt-2">Description</h4>
-            <textarea class="form-control" name="introduction" [(ngModel)]="user.introduction" rows="6"></textarea>
+            <textarea class="form-control" name="introduction" [(ngModel)]="user()!.introduction" rows="6"></textarea>
             <h4 class="mt-2">Looking for</h4>
-            <textarea class="form-control" name="lookingFor" [(ngModel)]="user.lookingFor" rows="6"></textarea>
+            <textarea class="form-control" name="lookingFor" [(ngModel)]="user()!.lookingFor" rows="6"></textarea>
             <h4 class="mt-2">Interests</h4>
-            <textarea class="form-control" name="interests" [(ngModel)]="user.interests" rows="6"></textarea>
+            <textarea class="form-control" name="interests" [(ngModel)]="user()!.interests" rows="6"></textarea>
 
             <h4 class="mt-2">Location details</h4>
             <div class="d-flex align-items-center">
               <label>City: </label>
-              <input type="text" name="city" [(ngModel)]="user.city" class="form-control mx-2">
+              <input type="text" name="city" [(ngModel)]="user()!.city" class="form-control mx-2">
               <label>Country: </label>
-              <input type="text" name="country" [(ngModel)]="user.country" class="form-control mx-2">
+              <input type="text" name="country" [(ngModel)]="user()!.country" class="form-control mx-2">
             </div>
           </form>
         </tab>
         <tab heading="Edit photos">
-          <app-photo-editor [user]="user" (userUpdated)="onUserUpdated($event)"></app-photo-editor>
+          <app-photo-editor [user]="user()!" (userUpdated)="onUserUpdated($event)"></app-photo-editor>
         </tab>
       </tabset>
     </div>

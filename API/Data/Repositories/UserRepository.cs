@@ -1,5 +1,10 @@
-﻿using API.Data.DTOs;
+﻿using System.Linq.Expressions;
+
+using API.Data.DTOs;
+using API.Data.Responses;
 using API.Entities;
+using API.Helpers;
+using API.Services.Abstractions;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -8,55 +13,64 @@ using Microsoft.EntityFrameworkCore;
 
 namespace API.Data.Repositories;
 
-public interface IUserRepository {
-  void Update(DbUser user);
-  Task<bool> TrySaveAllAsync();
-  Task<IEnumerable<DbUser>> GetDbUsersAsync();
-  Task<DbUser?> GetDbUserAsync(uint id);
-  Task<DbUser?> GetDbUserAsync(string username);
-  
-  Task AddDbUserAsync(DbUser user);
-  
-  Task<bool> UserExistsAsync(string username);
-  Task<bool> UserExistsAsync(uint id);
-
-  Task<IEnumerable<SimpleUser>> GetSimpleUsersAsync();
-  Task<SimpleUser?> GetSimpleUserAsync(uint id);
-  Task<SimpleUser?> GetSimpleUserAsync(string username);
-}
-
 public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
   public void Update(DbUser user) => db.Entry(user).State = EntityState.Modified;
 
   public async Task<bool> TrySaveAllAsync() => await db.SaveChangesAsync() > 0;
-
-  public async Task<IEnumerable<DbUser>> GetDbUsersAsync() 
-    => await db.Users.Include(u => u.Photos).ToListAsync();
   
+  public async Task<int> CountAsync(UserFilter filter) => await DbUsers(tracking: false).Filter(filter).CountAsync();
+
+  public async Task UpdateLastActiveAsync(uint id) 
+    => await db.Users.Where(user => user.Id == id)
+      .ExecuteUpdateAsync(setters => setters.SetProperty(user => user.LastActive, DateTime.UtcNow));
+  
+  public async Task UpdateLastActiveAsync(string username) 
+    => await db.Users.Where(UsernameEqualsLowercased(username))
+      .ExecuteUpdateAsync(setters => setters.SetProperty(user => user.LastActive, DateTime.UtcNow));
+
+  public async Task<IEnumerable<DbUser>> GetDbUsersAsync(Page page, UserFilter filter, UserSortOrder? sortOrder) 
+    => await DbUsers()
+      .Filter(filter)
+      .Sort(sortOrder)
+      .Slice(page)
+      .ToListAsync();
+
   public async Task<DbUser?> GetDbUserAsync(uint id) 
-    => await db.Users.Include(u => u.Photos).SingleOrDefaultAsync(user => user.Id == id);
+    => await DbUsers().SingleOrDefaultAsync(user => user.Id == id);
   
   public async Task<DbUser?> GetDbUserAsync(string username) 
-    => await db.Users.Include(u => u.Photos).SingleOrDefaultAsync(user => user.Username == username.ToLower());
+    => await DbUsers().SingleOrDefaultAsync(UsernameEqualsLowercased(username));
   
   public async Task AddDbUserAsync(DbUser user) => await db.Users.AddAsync(user);
   
   public async Task<bool> UserExistsAsync(string username) 
-    => await db.Users.AnyAsync(user => user.Username == username.ToLower());
+    => await DbUsers(tracking: false)
+      .AnyAsync(UsernameEqualsLowercased(username));
   
   public async Task<bool> UserExistsAsync(uint id) 
-    => await db.Users.AnyAsync(user => user.Id == id);
-
-  public async Task<IEnumerable<SimpleUser>> GetSimpleUsersAsync()
-    => await db.Users.ProjectTo<SimpleUser>(mapper.ConfigurationProvider).ToListAsync();
+    => await DbUsers(tracking: false)
+      .AnyAsync(user => user.Id == id);
+  
+  public async Task<IEnumerable<SimpleUser>> GetSimpleUsersAsync(Page page, UserFilter filter, UserSortOrder? sortOrder)
+    => await DbUsers(tracking: false)
+      .Filter(filter)
+      .Sort(sortOrder)
+      .Slice(page)
+      .ProjectTo<SimpleUser>(mapper.ConfigurationProvider)
+      .ToListAsync();
 
   public async Task<SimpleUser?> GetSimpleUserAsync(uint id) 
-    => await db.Users.Where(u => u.Id == id)
+    => await DbUsers(tracking: false)
+      .Where(u => u.Id == id)
       .ProjectTo<SimpleUser>(mapper.ConfigurationProvider)
       .SingleOrDefaultAsync();
 
   public async Task<SimpleUser?> GetSimpleUserAsync(string username)
-    => await db.Users.Where(u => u.Username == username.ToLower())
+    => await DbUsers(tracking: false)
+      .Where(UsernameEqualsLowercased(username))
       .ProjectTo<SimpleUser>(mapper.ConfigurationProvider)
       .SingleOrDefaultAsync();
+  
+  private static Expression<Func<DbUser, bool>> UsernameEqualsLowercased(string username) => user => user.Username == username.ToLower();
+  private IQueryable<DbUser> DbUsers(bool tracking = true) => tracking ? db.Users.Include(u => u.Photos) : db.Users.AsNoTracking().Include(u => u.Photos);
 }

@@ -4,10 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { User } from '../../_models/user';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
+import { TimeagoModule, TimeagoPipe } from 'ngx-timeago';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-detail',
-  imports: [TabsModule, GalleryModule],
+  imports: [TabsModule, GalleryModule, TimeagoModule, DatePipe],
   templateUrl: './user-detail.html',
   styleUrl: './user-detail.css'
 })

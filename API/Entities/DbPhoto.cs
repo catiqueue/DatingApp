@@ -3,8 +3,7 @@
 namespace API.Entities;
 
 [Table("Photos")]
-public sealed class DbPhoto {
-  public uint Id { get; set; }
+public sealed class DbPhoto : DbEntityBase {
   public required string Url { get; set; }
   public bool IsMain { get; set; }
   public string? PublicId { get; set; }

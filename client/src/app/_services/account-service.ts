@@ -5,12 +5,14 @@ import { LoginForm } from '../_models/login-form';
 import { map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Photo } from '../_models/photo';
+import { UsersCacheService } from './cache/users-cache';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private http = inject(HttpClient);
+  private cache = inject(UsersCacheService);
   baseUrl = environment.apiUrl;
   currentUser = signal<LoggedInUser | null>(null);
 
@@ -47,5 +49,6 @@ export class AccountService {
   unsetCurrentUser() {
     localStorage.removeItem("user");
     this.currentUser.set(null);
+    this.cache.clearAll();
   }
 }

@@ -1,7 +1,12 @@
-﻿namespace API.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public sealed class DbUser {
-  public uint Id { get; set; }
+using API.Extensions;
+using API.Helpers;
+
+namespace API.Entities;
+
+public sealed class DbUser : DbEntityBase, IFilterableUser, ISortableUser {
+  // public uint Id { get; set; }
   public required string Username { get; set; }
   public string Base64PasswordHash { get; set; } = "";
   public string Base64PasswordSalt { get; set; } = "";

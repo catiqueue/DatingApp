@@ -1,25 +1,31 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UsersService } from '../../_services/users-service';
-import { User } from '../../_models/user';
 import { UserCard } from "../user-card/user-card";
+import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { FormsModule } from '@angular/forms';
+import { ButtonsModule } from 'ngx-bootstrap/buttons';
+import { UsersCacheService } from '../../_services/cache/users-cache';
 
 @Component({
   selector: 'app-user-list',
-  imports: [UserCard],
+  imports: [UserCard, PaginationModule, FormsModule, ButtonsModule],
   templateUrl: './user-list.html',
   styleUrl: './user-list.css'
 })
 export class UserList implements OnInit {
-  private usersService = inject(UsersService);
-  users: User[] = [];
+  usersService = inject(UsersService);
+  usersCache = inject(UsersCacheService);
 
   ngOnInit(): void {
-    this.loadUsers();
+    if(!this.usersCache.users()?.length) this.usersService.resetCache();
   }
 
-  loadUsers() {
-    this.usersService.getUsers().subscribe({
-      next: users => this.users = users
-    });
+  pageChanged(event: any) {
+    var pagination = this.usersCache.pagination();
+    if(!pagination) return;
+    if(pagination.current.pageNumber === event.page) return;
+    pagination.current.pageNumber = event.page;
+    this.usersCache.pagination.set(pagination);
+    this.usersService.loadUsers();
   }
 }

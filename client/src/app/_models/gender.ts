@@ -1,3 +1,6 @@
 export enum Gender {
-  Male, Female, Unspecified, Unknown
+  Male = "male",
+  Female = "female",
+  Unspecified = "unspecified",
+  Unknown = "unknown"
 }

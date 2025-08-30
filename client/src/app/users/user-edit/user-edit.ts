@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { User } from '../../_models/user';
 import { AccountService } from '../../_services/account-service';
 import { UsersService } from '../../_services/users-service';
@@ -6,11 +6,13 @@ import { TabsModule } from 'ngx-bootstrap/tabs';
 import { FormsModule, NgForm } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
 import { PhotoEditor } from "../photo-editor/photo-editor";
+import { TimeagoModule } from 'ngx-timeago';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-edit',
   standalone: true,
-  imports: [TabsModule, FormsModule, PhotoEditor],
+  imports: [TabsModule, FormsModule, PhotoEditor, TimeagoModule, DatePipe],
   templateUrl: './user-edit.html',
   styleUrl: './user-edit.css'
 })
@@ -21,7 +23,7 @@ export class UserEdit implements OnInit {
       $event.returnValue = true;
     }
   }
-  user: User | null = null;
+  user = signal<User | null>(null);
   private accountService = inject(AccountService);
   private userService = inject(UsersService);
   private toaster = inject(ToastrService);
@@ -34,7 +36,7 @@ export class UserEdit implements OnInit {
     var user = this.accountService.currentUser();
     if(!user) return;
     this.userService.getUserByUsername(user.username).subscribe({
-      next: user => this.user = user
+      next: user => this.user.set(user)
     });
   }
 
@@ -48,6 +50,6 @@ export class UserEdit implements OnInit {
   }
 
   onUserUpdated(updated: User) {
-    this.user = updated;
+    this.user.set(updated);
   }
 }

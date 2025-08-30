@@ -6,6 +6,7 @@ using API.Data;
 using API.Data.DTOs;
 using API.Data.Repositories;
 using API.Data.Requests;
+using API.Data.Responses;
 using API.Entities;
 using API.Services;
 using API.Services.Abstractions;
@@ -29,9 +30,9 @@ public sealed class AccountController(IUserRepository users, ITokenService token
     user.Base64PasswordSalt = Convert.ToBase64String(encoder.Key);
     
     await users.AddDbUserAsync(user);
-    if(!await users.TrySaveAllAsync()) { return BadRequest("Failed to register the user."); }
-    
-    return Ok(new AuthenticatedUser(user.Username, user.KnownAs, tokenSvc.CreateToken(user), user.Photos.FirstOrDefault(x => x.IsMain)?.Url));
+    return await users.TrySaveAllAsync()
+      ? Ok(AuthenticatedUser.FromDbUser(user, tokenSvc.CreateToken(user)))
+      : BadRequest("Failed to register the user.");
   }
   
   [HttpPost("login")]
@@ -42,8 +43,8 @@ public sealed class AccountController(IUserRepository users, ITokenService token
     using var encoder = new HMACSHA512(Convert.FromBase64String(user.Base64PasswordSalt));
     
     var base64PasswordHash = Convert.ToBase64String(encoder.ComputeHash(Encoding.UTF8.GetBytes(request.Password)));
-    if (base64PasswordHash != user.Base64PasswordHash) return Unauthorized("The password was incorrect.");
-    
-    return Ok(new AuthenticatedUser(user.Username, user.KnownAs, tokenSvc.CreateToken(user), user.Photos.FirstOrDefault(x => x.IsMain)?.Url));
+    return base64PasswordHash == user.Base64PasswordHash
+      ? Ok(AuthenticatedUser.FromDbUser(user, tokenSvc.CreateToken(user)))
+      : Unauthorized("The password was incorrect.");
   }
 }
