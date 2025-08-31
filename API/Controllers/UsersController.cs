@@ -23,7 +23,7 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
       ? Ok(PaginatedResponse<SimpleUser>.FromPaginationInfo(
         paginationInfo, 
         await users.GetSimpleUsersAsync(paginationInfo.Page, request.ToFilter(User.GetUsername()), request.OrderBy)))
-      : BadRequest($"Page {request.Page} does not exist.");
+      : BadRequest($"Page {request.PageNumber} does not exist.");
 
   [HttpGet("{id:int}")] 
   public async Task<ActionResult<SimpleUser>> GetUser(uint id) {

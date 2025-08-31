@@ -1,12 +1,13 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpRequest } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { User } from '../_models/user';
 import { Photo } from '../_models/photo';
-import { Page, PaginatedResponse, PaginationInfo } from '../_models/pagination';
+import { Page, PaginationInfo } from '../_models/pagination';
 import { FilterParams } from '../_models/filer-params';
 import { SortOrder } from '../_models/sort-order';
 import { UsersCacheService } from './cache/users-cache';
+import { readPaginatedResponse, appendHttpParams } from './pagination-utils';
 
 @Injectable({
   providedIn: 'root'
@@ -15,10 +16,6 @@ export class UsersService {
   private http = inject(HttpClient);
   private cache = inject(UsersCacheService);
   baseUrl = environment.apiUrl;
-  /* users = signal<User[]>([]);
-  pagination = signal<PaginationInfo | null>(null);
-  filter = signal<FilterParams>({});
-  sortOrder = signal<SortOrder | null>(null); */
 
   resetCache() {
     this.cache.clearFilters();
@@ -31,25 +28,10 @@ export class UsersService {
 
   private loadUsersInternal(page?: Page, filter?: FilterParams, order?: SortOrder) {
     var queryParams = new HttpParams();
-    if(page) queryParams = this.setPaginationParams(queryParams, page);
-    if(filter) queryParams = this.setQueryFilterParams(queryParams, filter);
+    if(page) queryParams = appendHttpParams(queryParams, page);
+    if(filter) queryParams = appendHttpParams(queryParams, filter);
     if(order) queryParams = queryParams.append("orderBy", order);
-    this.http.get<PaginatedResponse<User>>(this.baseUrl + "/users", { params: queryParams }).subscribe({
-      next: response => {
-        this.cache.users.set(response.items)
-        this.cache.pagination.set(response)
-      }
-    });
-  }
-
-  private setPaginationParams(params: HttpParams, page: Page) {
-    return params.append("page", page.pageNumber).append("pageSize", page.pageSize);
-  }
-  private setQueryFilterParams(params: HttpParams, filter: FilterParams) {
-    if(filter.gender) params = params.append("gender", filter.gender);
-    if(filter.minAge) params = params.append("minAge", filter.minAge);
-    if(filter.maxAge) params = params.append("maxAge", filter.maxAge);
-    return params;
+    readPaginatedResponse(this.http, this.baseUrl + "/users", queryParams, this.cache.users, this.cache.pagination as WritableSignal<PaginationInfo>);
   }
 
   getUserByUsername(username: string) {

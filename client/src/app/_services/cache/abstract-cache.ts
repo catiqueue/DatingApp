@@ -38,4 +38,5 @@ export abstract class AbstractCache<TSchema extends Record<string, any>> {
       signal.set(updater as TSchema[K]);
     }
   }
+  abstract clearAll(): void;
 }

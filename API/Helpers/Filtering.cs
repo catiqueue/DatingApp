@@ -7,10 +7,10 @@ public interface IFilterableUser {
   string KnownAs { get; }
   DateOnly DateOfBirth { get; }
   UserGender Gender { get; }
-  string Interests { get; }
-  string LookingFor { get; }
-  string City { get; }
-  string Country { get; }
+  string? Interests { get; }
+  string? LookingFor { get; }
+  string? City { get; }
+  string? Country { get; }
 }
 
 public sealed record UserFilter(UserGender? Gender, int? MinAge, int? MaxAge, IEnumerable<string> SkippedUsernames) {

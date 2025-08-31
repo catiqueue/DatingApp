@@ -6,13 +6,18 @@ import { map } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Photo } from '../_models/photo';
 import { UsersCacheService } from './cache/users-cache';
+import { LikesCacheService } from './cache/likes-cache';
+import { LikesService } from './likes-service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
   private http = inject(HttpClient);
-  private cache = inject(UsersCacheService);
+  // TODO: make a global cache service to access specific caches from (so i can clear them with one call)
+  private usersCache = inject(UsersCacheService);
+  private likesCache = inject(LikesCacheService);
+  private likesService = inject(LikesService);
   baseUrl = environment.apiUrl;
   currentUser = signal<LoggedInUser | null>(null);
 
@@ -37,6 +42,7 @@ export class AccountService {
   setCurrentUser(user: LoggedInUser) {
     localStorage.setItem("user", JSON.stringify(user));
     this.currentUser.set(user);
+    this.likesService.loadLikedIds();
   }
 
   setAvatar(photo: Photo) {
@@ -49,6 +55,7 @@ export class AccountService {
   unsetCurrentUser() {
     localStorage.removeItem("user");
     this.currentUser.set(null);
-    this.cache.clearAll();
+    this.usersCache.clearAll();
+    this.likesCache.clearAll();
   }
 }

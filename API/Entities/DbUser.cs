@@ -21,4 +21,6 @@ public sealed class DbUser : DbEntityBase, IFilterableUser, ISortableUser {
   public required string City { get; set; }
   public required string Country { get; set; }
   public List<DbPhoto> Photos { get; set; } = [];
+  public List<DbUserLike> LikedBy { get; set; } = [];
+  public List<DbUserLike> Likes { get; set; } = [];
 }
