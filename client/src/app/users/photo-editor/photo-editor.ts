@@ -37,7 +37,6 @@ export class PhotoEditor implements OnInit {
   setMainPhoto(photo: Photo) {
     this.usersService.setMainPhoto(photo).subscribe({
       next: () => {
-        // this feels so stupid
         this.accountService.setAvatar(photo);
 
         var updatedUser =  {...this.user()}

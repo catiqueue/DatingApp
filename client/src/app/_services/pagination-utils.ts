@@ -12,11 +12,12 @@ export function appendHttpParams<T extends Record<string, any>>(params: HttpPara
   return params;
 }
 
-export function readPaginatedResponse<T>(client: HttpClient, url: string, params: HttpParams, data: WritableSignal<T[]>, pagination: WritableSignal<PaginationInfo>) {
+export function readPaginatedResponse<T>(client: HttpClient, url: string, params: HttpParams, data: WritableSignal<T[]>, pagination: WritableSignal<PaginationInfo | undefined>) {
   client.get<PaginatedResponse<T>>(url, {params: params}).subscribe({
     next: response => {
       data.set(response.items);
       pagination.set(response);
-    }
+    },
+    error: (_) => { data.set([]); pagination.set(undefined); }
   });
 }

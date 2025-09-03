@@ -18,10 +18,8 @@ public class LikesController(ILikesRepository likes) : ApiControllerBase {
     var liking = User.GetId();
     
     if(liking == liked) return BadRequest("You can't like yourself. (sorry)");
-    
-    var existingLike = await likes.GetDbLikeAsync(liking, liked);
-    
-    if (existingLike == null) {
+
+    if (await likes.GetDbLikeAsync(liking, liked) is not { } existingLike) {
       likes.AddLike(new DbUserLike { LikingUserId = liking, LikedUserId = liked });
     } else {
       likes.DeleteLike(existingLike);
@@ -39,6 +37,7 @@ public class LikesController(ILikesRepository likes) : ApiControllerBase {
       ? Ok(PaginatedResponse<SimpleUser>.FromPaginationInfo(
           paginationInfo,
           await likes.GetSimpleUserLikedListAsync(request.ToPage(), request.Predicate, User.GetId()))) 
-      : BadRequest($"Page {request.PageNumber} does not exist.");
+      : request.PageNumber == 1
+        ? Ok(PaginatedResponse<SimpleUser>.Empty(request.PageSize))
+        : BadRequest($"Page {request.PageNumber} does not exist.");
 }
-  

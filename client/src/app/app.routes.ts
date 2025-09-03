@@ -10,6 +10,7 @@ import { NotFound } from './errors/not-found/not-found';
 import { ServerError } from './errors/server-error/server-error';
 import { UserEdit } from './users/user-edit/user-edit';
 import { preventLosingChangesGuard } from './_guards/prevent-losing-changes-guard';
+import { userDetailedResolver } from './_resolvers/user-detailed-resolver';
 
 export const routes: Routes = [
   {path: "", component: Home},
@@ -19,7 +20,7 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       {path: "users", component: UserList},
-      {path: "users/:username", component: UserDetail},
+      {path: "users/:username", component: UserDetail, resolve: {user: userDetailedResolver}},
       {path: "user/edit", component: UserEdit, canDeactivate: [preventLosingChangesGuard]},
       {path: "lists", component: Lists},
       {path: "messages", component: Messages},

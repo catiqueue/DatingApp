@@ -40,11 +40,14 @@
         <div class="btn-group float-end">
           <button type="button" class="btn btn-primary" name="order"
           (click)="usersService.loadUsers()" btnRadio="lastActive" [(ngModel)]="sortOrder">Last active</button>
-                    <button type="button" class="btn btn-primary" name="order"
+
+          <button type="button" class="btn btn-primary" name="order"
           (click)="usersService.loadUsers()" btnRadio="createdAt" [(ngModel)]="sortOrder">Newest users</button>
-                    <button type="button" class="btn btn-primary" name="order"
+
+          <button type="button" class="btn btn-primary" name="order"
           (click)="usersService.loadUsers()" btnRadio="dateOfBirth" [(ngModel)]="sortOrder">Age</button>
-                    <button type="button" class="btn btn-primary" name="order"
+
+          <button type="button" class="btn btn-primary" name="order"
           (click)="usersService.loadUsers()" btnRadio="knownAs" [(ngModel)]="sortOrder">Name</button>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { Photo } from '../_models/photo';
 import { UsersCacheService } from './cache/users-cache';
 import { LikesCacheService } from './cache/likes-cache';
 import { LikesService } from './likes-service';
+import { MessagesCacheService } from './cache/messages-cache';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class AccountService {
   // TODO: make a global cache service to access specific caches from (so i can clear them with one call)
   private usersCache = inject(UsersCacheService);
   private likesCache = inject(LikesCacheService);
+  private messagesCache = inject(MessagesCacheService);
   private likesService = inject(LikesService);
   baseUrl = environment.apiUrl;
   currentUser = signal<LoggedInUser | null>(null);
@@ -57,5 +59,7 @@ export class AccountService {
     this.currentUser.set(null);
     this.usersCache.clearAll();
     this.likesCache.clearAll();
+    this.messagesCache.clearAll();
+
   }
 }

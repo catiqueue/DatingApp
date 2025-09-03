@@ -1,1 +1,56 @@
-<p>messages works!</p>
+@let defaultAvatarUrl = "./assets/user.png";
+
+<div class="container mt-3">
+  <div class="d-flex">
+    <div class="btn-group">
+      <button class="btn btn-primary" btnRadio="unread" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Unread</button>
+      <button class="btn btn-primary" btnRadio="inbox" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Inbox</button>
+      <button class="btn btn-primary" btnRadio="outbox" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Outbox</button>
+    </div>
+  </div>
+</div>
+
+@if(!messagesCache.messages().length) {
+  <h3 class="mt-3">No messages</h3>
+} @else {
+  <table class="table table-hover mt-3" style="cursor: pointer;">
+    <thead>
+      <tr>
+        <th style="width: 40%;">Message</th>
+        <th style="width: 20%;">From / To</th>
+        <th style="width: 20%;">Sent / Received </th>
+        <th style="width: 20%;">Message</th>
+      </tr>
+    </thead>
+    <tbody class="aling-middle">
+      @for(message of messagesCache.messages(); track message.id) {
+        <tr routerLink="{{getRoute(message)}}" [queryParams]="{tab: 'Messages'}">
+          <td>{{message.content}}</td>
+          <td>
+            <div>
+              <img [src]="isOutbox
+                ? (message.recipientAvatarUrl || defaultAvatarUrl)
+                : (message.senderAvatarUrl || defaultAvatarUrl)" alt="User's avatar"
+                class="rounded-circle me-2">
+              <strong>{{isOutbox
+                ? message.recipientUsername
+                : message.senderUsername}}</strong>
+            </div>
+          </td>
+          <td>{{message.sentAt | timeago}}</td>
+          <td (click)="$event.stopPropagation()"><button class="btn btn-danger" (click)="deleteMessage(message.id)">Delete</button></td>
+        </tr>
+      }
+    </tbody>
+  </table>
+
+  @if(messagesCache.pagination()) {
+  <div class="d-flex justify-content-center">
+    <pagination [boundaryLinks]="true" [totalItems]="messagesCache.pagination()!.totalCount"
+                [itemsPerPage]="messagesCache.pagination()!.current.pageSize" [maxSize]="10"
+                (pageChanged)="pageChanged($event)" [(ngModel)]="messagesCache.pagination()!.current.pageNumber"
+                previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;"></pagination>
+  </div>
+  }
+}

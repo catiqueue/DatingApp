@@ -7,6 +7,7 @@ using API.Helpers;
 using API.Services;
 using API.Services.Abstractions;
 using API.Services.Abstractions.PhotoService;
+using API.Services.Abstractions.Repositories;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,7 @@ public static class ServiceCollectionExtensions {
       .AddDefaultJwtTokenService()
       .AddUserRepository()
       .AddLikesRepository()
+      .AddMessagesRepository()
       .AddAutoMapper(typeof(Program).Assembly)
       .ConfigureCloudinary(configuration)
       .AddCloudinaryPhotoService()
@@ -40,6 +42,9 @@ public static class ServiceCollectionExtensions {
   
   private static IServiceCollection AddLikesRepository(this IServiceCollection services)
     => services.AddScoped<ILikesRepository, LikeRepository>();
+  
+  private static IServiceCollection AddMessagesRepository(this IServiceCollection services)
+    => services.AddScoped<IMessagesRepository, MessageRepository>();
   #endregion
 
   #region Services

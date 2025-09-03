@@ -31,7 +31,7 @@ export class UsersService {
     if(page) queryParams = appendHttpParams(queryParams, page);
     if(filter) queryParams = appendHttpParams(queryParams, filter);
     if(order) queryParams = queryParams.append("orderBy", order);
-    readPaginatedResponse(this.http, this.baseUrl + "/users", queryParams, this.cache.users, this.cache.pagination as WritableSignal<PaginationInfo>);
+    readPaginatedResponse(this.http, this.baseUrl + "/users", queryParams, this.cache.users, this.cache.pagination);
   }
 
   getUserByUsername(username: string) {

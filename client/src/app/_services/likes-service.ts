@@ -31,7 +31,7 @@ export class LikesService {
     var params = new HttpParams();
     if(page) params = appendHttpParams(params, page);
     params = params.append("predicate", predicate);
-    readPaginatedResponse(this.http, this.baseUrl + "/likes", params, this.cache.users, this.cache.pagination as WritableSignal<PaginationInfo>);
+    readPaginatedResponse(this.http, this.baseUrl + "/likes", params, this.cache.users, this.cache.pagination);
   }
 
   loadLikedIds() {

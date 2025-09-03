@@ -21,27 +21,25 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
   public async Task<ActionResult<PaginatedResponse<SimpleUser>>> GetUsers([FromQuery] GetUsersRequest request) =>
     PaginationInfo.TryCreate(request.ToPage(), await users.CountAsync(request.ToFilter(User.GetUsername())), out var paginationInfo)
       ? Ok(PaginatedResponse<SimpleUser>.FromPaginationInfo(
-        paginationInfo, 
-        await users.GetSimpleUsersAsync(paginationInfo.Page, request.ToFilter(User.GetUsername()), request.OrderBy)))
-      : BadRequest($"Page {request.PageNumber} does not exist.");
+          paginationInfo,
+          await users.GetSimpleUsersAsync(paginationInfo.Page, request.ToFilter(User.GetUsername()), request.OrderBy)))
+      // don't shout
+      : request.PageNumber == 1
+        ? Ok(PaginatedResponse<SimpleUser>.Empty(request.PageSize))
+        : BadRequest($"Page {request.PageNumber} does not exist.");
 
   [HttpGet("{id:int}")] 
-  public async Task<ActionResult<SimpleUser>> GetUser(uint id) {
-    var user = await users.GetDbUserAsync(id);
-    if(user == null) return NotFound();
-    return Ok(await users.GetSimpleUserAsync(id));
-  }
-  
+  public async Task<ActionResult<SimpleUser>> GetUser(uint id) 
+    => await users.GetDbUserAsync(id) is null ? NotFound() : Ok(await users.GetSimpleUserAsync(id));
+
   [HttpGet("{username}")] 
-  public async Task<ActionResult<SimpleUser>> GetUser(string username) {
-    var user = await users.GetDbUserAsync(username);
-    return user == null ? NotFound() : Ok(await users.GetSimpleUserAsync(username));
-  }
+  public async Task<ActionResult<SimpleUser>> GetUser(string username) 
+    => await users.GetDbUserAsync(username) is null ? NotFound() : Ok(await users.GetSimpleUserAsync(username));
 
   [HttpPut]
   public async Task<ActionResult> UpdateUser(UpdateUserRequest request) {
-    var user = await users.GetDbUserAsync(User.GetUsername());
-    if (user is null) return BadRequest("Could not find you in the database. How did you do that?");
+    if (await users.GetDbUserAsync(User.GetUsername()) is not { } user) 
+      return BadRequest("Could not find you in the database. How did you do that?");
 
     mapper.Map(request, user);
 
@@ -50,8 +48,8 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
   
   [HttpPost("add-photo")]
   public async Task<ActionResult<SimplePhoto>> AddPhoto(IFormFile file) {
-    var user = await users.GetDbUserAsync(User.GetUsername());
-    if (user is null) return BadRequest("Could not find you in the database. How did you do that?");
+    if (await users.GetDbUserAsync(User.GetUsername()) is not { } user) 
+      return BadRequest("Could not find you in the database. How did you do that?");
     
     var result = await photoService.UploadPhotoAsync(file);
     if (!result.IsSuccessful) return BadRequest(result.Error.Message);
@@ -72,14 +70,15 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
   
   [HttpPut("set-main-photo/{photoId:int}")]
   public async Task<ActionResult> SetMainPhoto(uint photoId) {
-    var user = await users.GetDbUserAsync(User.GetUsername());
-    if (user is null) return BadRequest("Could not find you in the database. How did you do that?");
-
-    var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
-    if (photo is null || photo.IsMain) return BadRequest("Failed to set the main photo.");
-
-    var previousMain = user.Photos.FirstOrDefault(p => p.IsMain);
-    if (previousMain is not null) previousMain.IsMain = false;
+    if (await users.GetDbUserAsync(User.GetUsername()) is not { } user) 
+      return BadRequest("Could not find you in the database. How did you do that?");
+    
+    if (user.Photos.FirstOrDefault(p => p.Id == photoId) is not { } photo || photo.IsMain) 
+      return BadRequest("Failed to set the main photo.");
+    
+    if (user.Photos.FirstOrDefault(p => p.IsMain) is { } previousMain) 
+      previousMain.IsMain = false;
+    
     photo.IsMain = true;
     
     return await users.TrySaveAllAsync() ? NoContent() : BadRequest("Failed to set the main photo.");
@@ -87,14 +86,14 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
   
   [HttpDelete("delete-photo/{photoId:int}")]
   public async Task<ActionResult> DeletePhoto(uint photoId) {
-    var user = await users.GetDbUserAsync(User.GetUsername());
-    if (user is null) return BadRequest("Could not find you in the database. How did you do that?");
-
-    var photo = user.Photos.FirstOrDefault(p => p.Id == photoId);
-    if (photo is null || photo.IsMain) return BadRequest("Failed to delete the photo.");
+    if (await users.GetDbUserAsync(User.GetUsername()) is not { } user) 
+      return BadRequest("Could not find you in the database. How did you do that?");
     
-    if(photo.PublicId is not null 
-       && await photoService.DeletePhotoAsync(photo.PublicId) is { HasValue: true } error) return BadRequest(error.Value.Message);
+    if (user.Photos.FirstOrDefault(p => p.Id == photoId) is not { } photo || photo.IsMain) 
+      return BadRequest("Failed to delete the photo.");
+    
+    if(photo.PublicId is not null && await photoService.DeletePhotoAsync(photo.PublicId) is { HasValue: true } error) 
+      return BadRequest(error.Value.Message);
     
     user.Photos.Remove(photo);
     return await users.TrySaveAllAsync() ? Ok() : BadRequest("Failed to delete the photo.");

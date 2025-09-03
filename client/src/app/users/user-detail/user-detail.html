@@ -1,53 +1,48 @@
-@if(user) {
-  <div class="row">
-    <div class="col-4">
-      <div class="card">
-        <img
-        src="{{user.avatarUrl || './assets/user.png'}}"
-        alt="{{user.knownAs}}"
-        class="card-img img-thumbnail">
-        <div class="card-body">
-          <div>
-            <strong>Location:</strong>
-            <p>{{user.city}}, {{user.country}}</p>
-            <strong>Age:</strong>
-            <p>{{user.age}}</p>
-            <strong>Last active:</strong>
-            <p>{{user.lastActive | timeago}}</p>
-            <strong>A user since:</strong>
-            <p>{{user.createdAt | date: "dd MMM yyyy"}}</p>
-          </div>
+<div class="row">
+  <div class="col-4">
+    <div class="card">
+      <img src="{{user.avatarUrl || './assets/user.png'}}" alt="{{user.knownAs}}" class="card-img img-thumbnail">
+      <div class="card-body">
+        <div>
+          <strong>Location:</strong>
+          <p>{{user.city}}, {{user.country}}</p>
+          <strong>Age:</strong>
+          <p>{{user.age}}</p>
+          <strong>Last active:</strong>
+          <p>{{user.lastActive | timeago}}</p>
+          <strong>A user since:</strong>
+          <p>{{user.createdAt | date: "dd MMM yyyy"}}</p>
         </div>
-        <div class="card-footer">
-          <div class="btn-group d-flex">
-            <button class="btn btn-primary">Like</button>
-            <button class="btn btn-success">Message</button>
-          </div>
+      </div>
+      <div class="card-footer">
+        <div class="btn-group d-flex">
+          <button class="btn btn-primary">Like</button>
+          <button class="btn btn-success" (click)="selectTab('Messages')">Message</button>
         </div>
       </div>
     </div>
-
-    <div class="col-8">
-      <tabset class="user-tabset">
-        <tab heading="About {{user.knownAs}}">
-          <h4>Description</h4>
-          <p>{{user.introduction}}</p>
-          <h4>Looking for</h4>
-          <p>{{user.lookingFor}}</p>
-        </tab>
-        <tab heading="Interests">
-          <h4>Interests</h4>
-          <p>{{user.interests}}</p>
-        </tab>
-        <tab heading="Photos" #photoTab="tab">
-          @if(photoTab.active) {
-          <gallery [items]="images" [itemAutosize]="true" class="gallery"></gallery>
-          }
-        </tab>
-        <tab heading="Messages">
-          <p>Messages will go here</p>
-        </tab>
-      </tabset>
-    </div>
   </div>
-}
+
+  <div class="col-8">
+    <tabset class="user-tabset" #userTabs>
+      <tab heading="About {{user.knownAs}}" (selectTab)="onTabActivated($event)">
+        <h4>Description</h4>
+        <p>{{user.introduction}}</p>
+        <h4>Looking for</h4>
+        <p>{{user.lookingFor}}</p>
+      </tab>
+      <tab heading="Interests" (selectTab)="onTabActivated($event)">
+        <h4>Interests</h4>
+        <p>{{user.interests}}</p>
+      </tab>
+      <tab heading="Photos" #photoTab="tab" (selectTab)="onTabActivated($event)">
+        @if(photoTab.active) {
+        <gallery [items]="images" [itemAutosize]="true" class="gallery"></gallery>
+        }
+      </tab>
+      <tab heading="Messages" (selectTab)="onTabActivated($event)">
+        <app-user-messages [username]="user.username" [messages]="messages" (messageReceivedEvent)="onMessageReceived($event)"></app-user-messages>
+      </tab>
+    </tabset>
+  </div>
+</div>
