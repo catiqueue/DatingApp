@@ -52,7 +52,7 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
       return BadRequest("Could not find you in the database. How did you do that?");
     
     var result = await photoService.UploadPhotoAsync(file);
-    if (!result.IsSuccessful) return BadRequest(result.Error.Message);
+    if (result.IsFailure) return BadRequest(result.Error.Message);
 
     var photo = new DbPhoto {
       Url = result.Value.SecureUrl,
@@ -92,8 +92,8 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
     if (user.Photos.FirstOrDefault(p => p.Id == photoId) is not { } photo || photo.IsMain) 
       return BadRequest("Failed to delete the photo.");
     
-    if(photo.PublicId is not null && await photoService.DeletePhotoAsync(photo.PublicId) is { HasValue: true } error) 
-      return BadRequest(error.Value.Message);
+    if(photo.PublicId is not null && await photoService.DeletePhotoAsync(photo.PublicId) is { } error) 
+      return BadRequest(error.Message);
     
     user.Photos.Remove(photo);
     return await users.TrySaveAllAsync() ? Ok() : BadRequest("Failed to delete the photo.");

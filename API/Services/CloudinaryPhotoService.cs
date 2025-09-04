@@ -1,9 +1,8 @@
-﻿using API.Services.Abstractions.PhotoService;
+﻿using API.Helpers;
+using API.Services.Abstractions.PhotoService;
 
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-
-using DotNext;
 
 using Microsoft.Extensions.Options;
 
@@ -18,8 +17,8 @@ public sealed record CloudinaryOptions {
 public sealed class CloudinaryPhotoService(IOptions<CloudinaryOptions> options) : IPhotoService {
   private readonly Cloudinary _cloudinary = new(new Account(options.Value.CloudName, options.Value.ApiKey, options.Value.ApiSecret));
 
-  public async Task<Result<PhotoUploadInfo>> UploadPhotoAsync(IFormFile file) {
-    if (file.Length <= 0) return Result.FromException<PhotoUploadInfo>(new PhotoUploadError("File does not exist"));
+  public async Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file) {
+    if (file.Length <= 0) return PhotoUploadResult.Failure(new PhotoUploadError("File does not exist"));
     await using var stream = file.OpenReadStream();
     var uploadParams = new ImageUploadParams {
       File = new FileDescription(file.FileName, stream),
@@ -28,15 +27,15 @@ public sealed class CloudinaryPhotoService(IOptions<CloudinaryOptions> options) 
     };
     var response = await _cloudinary.UploadAsync(uploadParams);
     return response.Error is not { } error
-      ? Result.FromValue(new PhotoUploadInfo(response.SecureUrl.AbsoluteUri, response.PublicId))
-      : Result.FromException<PhotoUploadInfo>(new PhotoUploadError(error.Message));
+      ? PhotoUploadResult.Success(new PhotoUploadInfo(response.SecureUrl.AbsoluteUri, response.PublicId))
+      : PhotoUploadResult.Failure(new PhotoUploadError(error.Message));
   }
 
-  public async Task<Optional<PhotoDeletionError>> DeletePhotoAsync(string photoId) {
+  public async Task<PhotoDeletionError?> DeletePhotoAsync(string photoId) {
     var deleteParams = new DeletionParams(photoId);
     var result = await _cloudinary.DestroyAsync(deleteParams);
     return result.Error is not { } error
-      ? Optional.None<PhotoDeletionError>()
-      : Optional.Some(new PhotoDeletionError(error.Message));
+      ? null
+      : new PhotoDeletionError(error.Message);
   }
 }

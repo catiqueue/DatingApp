@@ -1,8 +1,8 @@
-﻿using DotNext;
+﻿using API.Helpers;
 
 namespace API.Services.Abstractions.PhotoService;
 
 public interface IPhotoService {
-  Task<Result<PhotoUploadInfo>> UploadPhotoAsync(IFormFile file);
-  Task<Optional<PhotoDeletionError>> DeletePhotoAsync(string photoId);
+  Task<PhotoUploadResult> UploadPhotoAsync(IFormFile file);
+  Task<PhotoDeletionError?> DeletePhotoAsync(string photoId);
 }
