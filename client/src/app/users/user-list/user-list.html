@@ -8,7 +8,7 @@
     <h2>Your matches - {{pagination()?.totalCount}}</h2>
   </div>
   <div class="container mt-3">
-    <form #form="ngForm" (ngSubmit)="usersService.loadUsers()" class="d-flex mb-3">
+    <form #form="ngForm" (ngSubmit)="onFiltersChanged()" class="d-flex mb-3">
 
 
       <div class="d-flex mx-2">
@@ -21,10 +21,10 @@
       </div>
       <div class="d-flex mx-2">
         <label class="col-form-label">Show: </label>
-        <select name="gender" style="width: 130px;" class="form-select ms-1" (change)="usersService.loadUsers()" [(ngModel)]="filter().gender">
-          @for(gender of (["Male", "Female"]); track $index) {
+        <select name="gender" style="width: 130px;" class="form-select ms-1" (change)="onFiltersChanged()" [(ngModel)]="filter().gender">
+          @for(gender of ["male", "female"]; track gender) {
             <option [value]="gender">
-              {{gender}}
+              {{gender | titlecase}}
             </option>
           }
         </select>
@@ -32,23 +32,23 @@
 
 
       <button class="btn btn-primary ms-1" type="submit">Apply filters</button>
-      <button class="btn btn-info ms-1" type="button" (click)="usersService.resetCache()">Reset filters</button>
+      <button class="btn btn-info ms-1" type="button" (click)="onFiltersReset()">Reset filters</button>
 
 
 
       <div class="col">
         <div class="btn-group float-end">
           <button type="button" class="btn btn-primary" name="order"
-          (click)="usersService.loadUsers()" btnRadio="lastActive" [(ngModel)]="sortOrder">Last active</button>
+          (click)="onFiltersChanged()" btnRadio="lastActive" [(ngModel)]="sortOrder">Last active</button>
 
           <button type="button" class="btn btn-primary" name="order"
-          (click)="usersService.loadUsers()" btnRadio="createdAt" [(ngModel)]="sortOrder">Newest users</button>
+          (click)="onFiltersChanged()" btnRadio="createdAt" [(ngModel)]="sortOrder">Newest users</button>
 
           <button type="button" class="btn btn-primary" name="order"
-          (click)="usersService.loadUsers()" btnRadio="dateOfBirth" [(ngModel)]="sortOrder">Age</button>
+          (click)="onFiltersChanged()" btnRadio="dateOfBirth" [(ngModel)]="sortOrder">Age</button>
 
           <button type="button" class="btn btn-primary" name="order"
-          (click)="usersService.loadUsers()" btnRadio="knownAs" [(ngModel)]="sortOrder">Name</button>
+          (click)="onFiltersChanged()" btnRadio="knownAs" [(ngModel)]="sortOrder">Name</button>
         </div>
       </div>
 
@@ -63,11 +63,11 @@
   }
 }
 </div>
-@if(pagination()) {
+@if(pagination()?.totalCount) {
   <div class="d-flex justify-content-center">
     <pagination [boundaryLinks]="true" [totalItems]="pagination()!.totalCount"
                 [itemsPerPage]="pagination()!.current.pageSize" [maxSize]="10"
-                (pageChanged)="pageChanged($event)" [(ngModel)]="pagination()!.current.pageNumber"
+                (pageChanged)="onPageChanged($event)" [(ngModel)]="pagination()!.current.pageNumber"
                 previousText="&lsaquo;" nextText="&rsaquo;"
                 firstText="&laquo;" lastText="&raquo;"></pagination>
   </div>

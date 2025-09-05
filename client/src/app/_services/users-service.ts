@@ -17,11 +17,6 @@ export class UsersService {
   private cache = inject(UsersCacheService);
   baseUrl = environment.apiUrl;
 
-  resetCache() {
-    this.cache.clearFilters();
-    this.loadUsers();
-  }
-
   public loadUsers() {
     this.loadUsersInternal(this.cache.pagination()?.current, this.cache.filter(), this.cache.sortOrder());
   }

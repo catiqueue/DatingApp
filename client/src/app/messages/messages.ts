@@ -8,6 +8,7 @@ import { MessageBoxType } from '../_models/message-box';
 import { TimeagoModule } from 'ngx-timeago';
 import { Message } from '../_models/message';
 import { RouterLink } from '@angular/router';
+import { setPageToOne } from '../_services/pagination-utils';
 
 @Component({
   selector: 'app-messages',
@@ -24,15 +25,11 @@ export class Messages implements OnInit {
     this.messagesService.loadMessages();
   }
 
-  /* isOutbox(box: MessageBoxType) {
-    return box === MessageBoxType.Outbox;
-  } */
-
   deleteMessage(id: number) {
     this.messagesService.deleteMessage(id).subscribe({
       next: _ => {
         this.messagesCache.messages.update(arr => arr.filter(mess => mess.id != id));
-        
+
       }
     });
   }
@@ -43,7 +40,12 @@ export class Messages implements OnInit {
       : message.senderUsername);
   }
 
-  pageChanged(event: any) {
+  onFilterChanged() {
+    this.messagesCache.pagination.update(prev => setPageToOne(prev));
+    this.messagesService.loadMessages();
+  }
+
+  onPageChanged(event: any) {
     var pagination = this.messagesCache.pagination();
     if(!pagination) return;
     if(pagination.current.pageNumber === event.page) return;

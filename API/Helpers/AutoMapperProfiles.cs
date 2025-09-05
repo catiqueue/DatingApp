@@ -7,11 +7,12 @@ namespace API.Helpers;
 
 public class AutoMapperProfiles : AutoMapper.Profile {
   public AutoMapperProfiles() {
-    CreateMap<RegisterRequest, DbUser>()
-      .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username.ToLower()));
+    CreateMap<RegisterRequest, DbUser>();
+      // .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Username.ToLower()));
     CreateMap<UpdateUserRequest, DbUser>();
-    
-    CreateMap<DbUser, SimpleUser>();
+
+    CreateMap<DbUser, SimpleUser>()
+      .ForMember(dest => dest.Roles, config => config.MapFrom(src => src.UserRoles.Select(role => role.Role.Name)));
     CreateMap<DbUser, AuthenticatedUser>();
     CreateMap<DbPhoto, SimplePhoto>();
     CreateMap<DbMessage, SimpleMessage>()

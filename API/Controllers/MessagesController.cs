@@ -17,21 +17,21 @@ namespace API.Controllers;
 public class MessagesController(IMessagesRepository messages, IUserRepository users, IMapper mapper) : ApiControllerBase {
   [HttpPost]
   public async Task<ActionResult<SimpleMessage>> CreateMessage(CreateMessageRequest request) {
-    var senderUsername = User.GetUsername();
+    var senderUsername = User.GetUsername().ToLower();
     if(senderUsername == request.RecipientUsername.ToLower()) 
       return BadRequest("You can't send a message to yourself.");
 
-    if(await users.GetDbUserAsync(senderUsername) is not {} sender) 
+    if(await users.GetDbUserAsync(senderUsername) is not { UserName: not null } sender ) 
       return BadRequest("Could not find you in the database. How did you do that?");
-    if(await users.GetDbUserAsync(request.RecipientUsername) is not {} recipient) 
+    if(await users.GetDbUserAsync(request.RecipientUsername) is not { UserName: not null } recipient) 
       return BadRequest("Could not find the recipient in the database.");
 
     var message = new DbMessage {
       Sender = sender,
-      SenderUsername = sender.Username,
+      SenderUsername = sender.UserName,
       
       Recipient = recipient,
-      RecipientUsername = recipient.Username,
+      RecipientUsername = recipient.UserName,
       
       Content = request.Content
     };

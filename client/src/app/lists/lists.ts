@@ -7,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { UserCard } from "../users/user-card/user-card";
 import { LikesCacheService } from '../_services/cache/likes-cache';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
+import { setPageToOne } from '../_services/pagination-utils';
 
 @Component({
   selector: 'app-lists',
@@ -37,11 +38,12 @@ export class Lists implements OnInit, OnDestroy {
     }
   }
 
-  loadList() {
+  onFilterChanged() {
+    this.likesCache.pagination.update(prev => setPageToOne(prev));
     this.likesService.loadLikedList();
   }
 
-  pageChanged(event: any) {
+  onPageChanged(event: any) {
     var pagination = this.likesCache.pagination();
     if(!pagination) return;
     if(pagination.current.pageNumber === event.page) return;

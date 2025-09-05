@@ -21,3 +21,7 @@ export function readPaginatedResponse<T>(client: HttpClient, url: string, params
     error: (_) => { data.set([]); pagination.set(undefined); }
   });
 }
+
+export function setPageToOne(pagination?: PaginationInfo) : PaginationInfo | undefined {
+  return pagination ? {...pagination, current: {...pagination?.current, pageNumber: 1}} : undefined;
+}

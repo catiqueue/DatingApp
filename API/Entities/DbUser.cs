@@ -3,13 +3,11 @@
 using API.Extensions;
 using API.Helpers;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace API.Entities;
 
-public sealed class DbUser : DbEntityBase, IFilterableUser, ISortableUser {
-  // public uint Id { get; set; }
-  public required string Username { get; set; }
-  public string Base64PasswordHash { get; set; } = "";
-  public string Base64PasswordSalt { get; set; } = "";
+public sealed class DbUser : IdentityUser<uint> {
   public DateOnly DateOfBirth { get; set; }
   public required string KnownAs { get; set; }
   public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -25,4 +23,5 @@ public sealed class DbUser : DbEntityBase, IFilterableUser, ISortableUser {
   public List<DbUserLike> Likes { get; set; } = [];
   public List<DbMessage> MessagesSent { get; set; } = [];
   public List<DbMessage> MessagesReceived { get; set; } = [];
+  public List<DbUserRole> UserRoles { get; set; } = [];
 }

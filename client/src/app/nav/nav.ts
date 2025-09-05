@@ -6,10 +6,11 @@ import { LoginForm } from '../_models/login-form';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { TitleCasePipe } from '@angular/common';
+import { HasRoleDirective } from '../_directives/has-role-directive';
 
 @Component({
   selector: 'app-nav',
-  imports: [RouterLink, RouterLinkActive, FormsModule, BsDropdownModule, TitleCasePipe],
+  imports: [RouterLink, RouterLinkActive, FormsModule, BsDropdownModule, TitleCasePipe, HasRoleDirective],
   templateUrl: './nav.html',
   styleUrl: './nav.css'
 })

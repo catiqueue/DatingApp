@@ -1,17 +1,31 @@
 ﻿using API.Entities;
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data;
 
-public sealed class DataContext(DbContextOptions<DataContext> settings) : DbContext(settings) {
-  public DbSet<DbUser> Users { get; set; }
+public sealed class DataContext(DbContextOptions<DataContext> settings) 
+  : IdentityDbContext<DbUser, DbRole, uint, IdentityUserClaim<uint>, DbUserRole, IdentityUserLogin<uint>, IdentityRoleClaim<uint>, IdentityUserToken<uint>>(settings) {
   public DbSet<DbUserLike> Likes { get; set; }
   public DbSet<DbMessage> Messages { get; set; }
 
   protected override void OnModelCreating(ModelBuilder builder) {
     base.OnModelCreating(builder);
+
+    builder.Entity<DbUserRole>()
+      .HasOne(join => join.User)
+      .WithMany(user => user.UserRoles)
+      .HasForeignKey(join => join.UserId)
+      .IsRequired();
+
+    builder.Entity<DbUserRole>()
+      .HasOne(join => join.Role)
+      .WithMany(role => role.UserRoles)
+      .HasForeignKey(join => join.RoleId)
+      .IsRequired();
     
     builder.Entity<DbUser>()
       .Property(u => u.Gender)

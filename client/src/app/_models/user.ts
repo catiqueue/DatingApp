@@ -3,7 +3,7 @@ import { Photo } from "./photo"
 
 export type User = {
   id: number
-  username: string
+  userName: string
   dateOfBirth: Date
   age: number
   avatarUrl: string
@@ -17,4 +17,5 @@ export type User = {
   city: string
   country: string
   photos: Photo[]
+  roles: string[]
 }

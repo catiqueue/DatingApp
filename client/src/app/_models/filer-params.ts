@@ -13,6 +13,10 @@ export class FilterParams {
   }
 
   static FromOppositeGender(user: LoggedInUser) : FilterParams {
-    return { gender: user.gender == Gender.Male ? Gender.Female : Gender.Male } as FilterParams
+    return { gender: user.gender == Gender.Male
+      ? Gender.Female
+      : user.gender == Gender.Female
+        ? Gender.Male
+        : undefined } as FilterParams
   }
 }

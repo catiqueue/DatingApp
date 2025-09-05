@@ -6,21 +6,23 @@ using API.Entities;
 using API.Extensions.Configuration;
 using API.Services.Abstractions;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
-public class TokenService(IConfiguration config) : ITokenService {
-  private const string TokenKeySelector = "TokenKey";
-  public string CreateToken(DbUser user) {
+public class TokenService(IConfiguration config, UserManager<DbUser> userManager) : ITokenService {
+  public async Task<string> CreateToken(DbUser user) {
+    if(user.UserName is null) throw new ArgumentException("The username is null.", nameof(user));
     var tokenKey = config.GetJwtSymmetricalKey();
     
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenKey));
     
     Claim[] claims = [
       // ReSharper disable ArrangeObjectCreationWhenTypeNotEvident // Stupid machine
-      new("nickname", user.Username),
-      new("id", user.Id.ToString())
+      new(ClaimTypes.Name, user.UserName),
+      new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+      ..(await userManager.GetRolesAsync(user)).Select(role => new Claim(ClaimTypes.Role, role))
       // ReSharper restore ArrangeObjectCreationWhenTypeNotEvident
     ];
     
@@ -31,8 +33,7 @@ public class TokenService(IConfiguration config) : ITokenService {
       Expires = DateTime.UtcNow.AddDays(7),
       SigningCredentials = credentials
     };
-
-    // Shut up
+    
     var tokenHandler = new JwtSecurityTokenHandler();
     var token = tokenHandler.CreateToken(descriptor);
     return tokenHandler.WriteToken(token);

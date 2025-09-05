@@ -49,14 +49,14 @@ public class MessageRepository(DataContext db, IMapper mapper) : IMessagesReposi
 
 file static class MessageHelpers {
   public static Expression<Func<DbMessage, bool>> MessageIsFrom(string username) 
-    => message => message.SenderUsername == username.ToLower() && message.SenderDeleted == false;
+    => message => message.SenderUsername == username && message.SenderDeleted == false;
   
   public static Expression<Func<DbMessage, bool>> MessageIsTo(string username) 
-    => message => message.RecipientUsername == username.ToLower() && message.RecipientDeleted == false;
+    => message => message.RecipientUsername == username && message.RecipientDeleted == false;
   
   public static Expression<Func<DbMessage, bool>> MessageIsFromThread(string caller, string other) 
-    => message => (caller.ToLower() == message.SenderUsername && message.RecipientUsername == other.ToLower() && !message.SenderDeleted) 
-               || (caller.ToLower() == message.RecipientUsername && message.SenderUsername == other.ToLower() && !message.RecipientDeleted);
+    => message => (caller == message.SenderUsername && message.RecipientUsername == other && !message.SenderDeleted) 
+               || (caller == message.RecipientUsername && message.SenderUsername == other && !message.RecipientDeleted);
   
   public static Expression<Func<DbMessage, bool>> MessageIsUnread => message => message.ReadAt == null;
   

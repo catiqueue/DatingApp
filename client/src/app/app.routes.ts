@@ -11,6 +11,8 @@ import { ServerError } from './errors/server-error/server-error';
 import { UserEdit } from './users/user-edit/user-edit';
 import { preventLosingChangesGuard } from './_guards/prevent-losing-changes-guard';
 import { userDetailedResolver } from './_resolvers/user-detailed-resolver';
+import { AdminPanel } from './admin/admin-panel/admin-panel';
+import { adminGuard } from './_guards/admin-guard';
 
 export const routes: Routes = [
   {path: "", component: Home},
@@ -24,6 +26,7 @@ export const routes: Routes = [
       {path: "user/edit", component: UserEdit, canDeactivate: [preventLosingChangesGuard]},
       {path: "lists", component: Lists},
       {path: "messages", component: Messages},
+      {path: "admin", component: AdminPanel, canActivate: [adminGuard]},
     ]
   },
   {path: "errors", component: TestErrors},

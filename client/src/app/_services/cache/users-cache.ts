@@ -14,7 +14,6 @@ export interface UsersCacheSchema {
 
 @Injectable({ providedIn: 'root' })
 export class UsersCacheService extends AbstractCache<UsersCacheSchema> {
-  
   public get users(): WritableSignal<User[]> {
     return this.getOrCreate("users", () => []);
   }
@@ -22,7 +21,7 @@ export class UsersCacheService extends AbstractCache<UsersCacheSchema> {
     return this.getOrCreate("pagination", () => undefined);
   }
   public get filter(): WritableSignal<FilterParams> {
-    return this.getOrCreate("filter", () => {return {};});
+    return this.getOrCreate("filter", () => ({ } as FilterParams));
   }
   public get sortOrder(): WritableSignal<SortOrder | undefined> {
     return this.getOrCreate("sortOrder", () => undefined);

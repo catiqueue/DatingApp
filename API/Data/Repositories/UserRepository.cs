@@ -1,7 +1,4 @@
-﻿using System.Linq.Expressions;
-
-using API.Data.DTOs;
-using API.Data.Responses;
+﻿using API.Data.Responses;
 using API.Entities;
 using API.Helpers;
 using API.Services.Abstractions;
@@ -25,7 +22,7 @@ public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
       .ExecuteUpdateAsync(setters => setters.SetProperty(user => user.LastActive, DateTime.UtcNow));
   
   public async Task UpdateLastActiveAsync(string username) 
-    => await db.Users.Where(UsernameEqualsLowercased(username))
+    => await db.Users.Where(u => u.UserName == username)
       .ExecuteUpdateAsync(setters => setters.SetProperty(user => user.LastActive, DateTime.UtcNow));
 
   public async Task<IEnumerable<DbUser>> GetDbUsersAsync(Page page, UserFilter filter, UserSortOrder? sortOrder) 
@@ -39,13 +36,13 @@ public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
     => await DbUsers().SingleOrDefaultAsync(user => user.Id == id);
   
   public async Task<DbUser?> GetDbUserAsync(string username) 
-    => await DbUsers().SingleOrDefaultAsync(UsernameEqualsLowercased(username));
+    => await DbUsers().SingleOrDefaultAsync(u => u.NormalizedUserName == username.Normalize().ToUpperInvariant());
   
   public async Task AddDbUserAsync(DbUser user) => await db.Users.AddAsync(user);
   
   public async Task<bool> UserExistsAsync(string username) 
     => await DbUsers(tracking: false)
-      .AnyAsync(UsernameEqualsLowercased(username));
+      .AnyAsync(u => u.NormalizedUserName == username.Normalize().ToUpperInvariant());
   
   public async Task<bool> UserExistsAsync(uint id) 
     => await DbUsers(tracking: false)
@@ -67,10 +64,9 @@ public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
 
   public async Task<SimpleUser?> GetSimpleUserAsync(string username)
     => await DbUsers(tracking: false)
-      .Where(UsernameEqualsLowercased(username))
+      .Where(u => u.NormalizedUserName == username.Normalize().ToUpperInvariant())
       .ProjectTo<SimpleUser>(mapper.ConfigurationProvider)
       .SingleOrDefaultAsync();
   
-  private static Expression<Func<DbUser, bool>> UsernameEqualsLowercased(string username) => user => user.Username == username.ToLower();
   private IQueryable<DbUser> DbUsers(bool tracking = true) => tracking ? db.Users.Include(u => u.Photos) : db.Users.AsNoTracking().Include(u => u.Photos);
 }

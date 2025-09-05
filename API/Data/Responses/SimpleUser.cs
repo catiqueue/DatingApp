@@ -5,10 +5,9 @@ using API.Helpers;
 
 namespace API.Data.Responses;
 
-// This is kind of stupid
-public class SimpleUser : IFilterableUser, ISortableUser {
+public class SimpleUser {
   public uint Id { get; init; }
-  public string Username { get; init; } = "";
+  public string UserName { get; init; } = "";
   public DateOnly DateOfBirth { get; init; }
   public uint Age => DateOfBirth.GetAge(now: DateOnly.FromDateTime(DateTime.UtcNow));
   public string? AvatarUrl => Photos.FirstOrDefault(ph => ph.IsMain)?.Url;
@@ -21,5 +20,6 @@ public class SimpleUser : IFilterableUser, ISortableUser {
   public string? LookingFor { get; init; }
   public string City { get; init; } = "";
   public string Country { get; init; } = "";
-  public List<SimplePhoto> Photos { get; init; } = [];
+  public IEnumerable<SimplePhoto> Photos { get; init; } = [];
+  public IEnumerable<string> Roles { get; init; } = [];
 }

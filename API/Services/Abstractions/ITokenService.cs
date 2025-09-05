@@ -3,5 +3,5 @@
 namespace API.Services.Abstractions;
 
 public interface ITokenService {
-  string CreateToken(DbUser user); 
+  Task<string> CreateToken(DbUser user); 
 }

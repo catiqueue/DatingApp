@@ -16,7 +16,7 @@
       </div>
       <div class="card-footer">
         <div class="btn-group d-flex">
-          <button class="btn btn-primary">Like</button>
+          <button class="btn btn-primary" (click)="toggleLike()">Like</button>
           <button class="btn btn-success" (click)="selectTab('Messages')">Message</button>
         </div>
       </div>
@@ -41,7 +41,7 @@
         }
       </tab>
       <tab heading="Messages" (selectTab)="onTabActivated($event)">
-        <app-user-messages [username]="user.username" [messages]="messages" (messageReceivedEvent)="onMessageReceived($event)"></app-user-messages>
+        <app-user-messages [username]="user.userName" [messages]="messages" (messageReceivedEvent)="onMessageReceived($event)"></app-user-messages>
       </tab>
     </tabset>
   </div>

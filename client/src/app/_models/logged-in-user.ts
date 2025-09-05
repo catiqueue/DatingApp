@@ -1,7 +1,7 @@
 import { Gender } from "./gender";
 
 export type LoggedInUser = {
-  username: string;
+  userName: string;
   knownAs: string;
   gender: Gender;
   token: string;

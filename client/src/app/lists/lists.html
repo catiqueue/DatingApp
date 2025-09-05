@@ -5,9 +5,9 @@
 <div class="container mt-3">
   <div class="d-flex">
     <div class="btn-group">
-      <button class="btn btn-primary" btnRadio="liked" [(ngModel)]="likesCache.predicate" (click)="loadList()">Users I like</button>
-      <button class="btn btn-primary" btnRadio="likedBy" [(ngModel)]="likesCache.predicate" (click)="loadList()">Users that like me</button>
-      <button class="btn btn-primary" btnRadio="mutual" [(ngModel)]="likesCache.predicate" (click)="loadList()">Mutual</button>
+      <button class="btn btn-primary" btnRadio="liked" [(ngModel)]="likesCache.predicate" (click)="onFilterChanged()">Users I like</button>
+      <button class="btn btn-primary" btnRadio="likedBy" [(ngModel)]="likesCache.predicate" (click)="onFilterChanged()">Users that like me</button>
+      <button class="btn btn-primary" btnRadio="mutual" [(ngModel)]="likesCache.predicate" (click)="onFilterChanged()">Mutual</button>
     </div>
   </div>
 
@@ -20,11 +20,11 @@
   </div>
 </div>
 
-@if(likesCache.pagination()) {
+@if(likesCache.pagination()?.totalCount) {
   <div class="d-flex justify-content-center">
     <pagination [boundaryLinks]="true" [totalItems]="likesCache.pagination()!.totalCount"
                 [itemsPerPage]="likesCache.pagination()!.current.pageSize" [maxSize]="10"
-                (pageChanged)="pageChanged($event)" [(ngModel)]="likesCache.pagination()!.current.pageNumber"
+                (pageChanged)="onPageChanged($event)" [(ngModel)]="likesCache.pagination()!.current.pageNumber"
                 previousText="&lsaquo;" nextText="&rsaquo;"
                 firstText="&laquo;" lastText="&raquo;"></pagination>
   </div>

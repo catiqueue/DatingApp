@@ -3,9 +3,9 @@
 <div class="container mt-3">
   <div class="d-flex">
     <div class="btn-group">
-      <button class="btn btn-primary" btnRadio="unread" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Unread</button>
-      <button class="btn btn-primary" btnRadio="inbox" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Inbox</button>
-      <button class="btn btn-primary" btnRadio="outbox" [(ngModel)]="messagesCache.box" (click)="messagesService.loadMessages()">Outbox</button>
+      <button class="btn btn-primary" btnRadio="unread" [(ngModel)]="messagesCache.box" (click)="onFilterChanged()">Unread</button>
+      <button class="btn btn-primary" btnRadio="inbox" [(ngModel)]="messagesCache.box" (click)="onFilterChanged()">Inbox</button>
+      <button class="btn btn-primary" btnRadio="outbox" [(ngModel)]="messagesCache.box" (click)="onFilterChanged()">Outbox</button>
     </div>
   </div>
 </div>
@@ -44,11 +44,11 @@
     </tbody>
   </table>
 
-  @if(messagesCache.pagination()) {
+  @if(messagesCache.pagination()?.totalCount) {
   <div class="d-flex justify-content-center">
     <pagination [boundaryLinks]="true" [totalItems]="messagesCache.pagination()!.totalCount"
                 [itemsPerPage]="messagesCache.pagination()!.current.pageSize" [maxSize]="10"
-                (pageChanged)="pageChanged($event)" [(ngModel)]="messagesCache.pagination()!.current.pageNumber"
+                (pageChanged)="onPageChanged($event)" [(ngModel)]="messagesCache.pagination()!.current.pageNumber"
                 previousText="&lsaquo;" nextText="&rsaquo;"
                 firstText="&laquo;" lastText="&raquo;"></pagination>
   </div>

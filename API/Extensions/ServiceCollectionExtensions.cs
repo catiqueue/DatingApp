@@ -2,6 +2,7 @@
 
 using API.Data;
 using API.Data.Repositories;
+using API.Entities;
 using API.Extensions.Configuration;
 using API.Helpers;
 using API.Services;
@@ -10,6 +11,7 @@ using API.Services.Abstractions.PhotoService;
 using API.Services.Abstractions.Repositories;
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -18,47 +20,44 @@ namespace API.Extensions;
 public static class ServiceCollectionExtensions {
   public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     => services.AddSqliteDbContext(configuration)
-      .AddCors()
-      .AddControllers().Services
-      .AddDefaultJwtTokenService()
-      .AddUserRepository()
-      .AddLikesRepository()
-      .AddMessagesRepository()
-      .AddAutoMapper(typeof(Program).Assembly)
-      .ConfigureCloudinary(configuration)
-      .AddCloudinaryPhotoService()
-      .AddUserActivityTracker()
-      .AddDefaultJwtAuthentication(configuration);
-
-  #region Database
+               .AddCors()
+               .AddControllers().Services
+               .AddServices(configuration)
+               .AddRepositories()
+               .AddAutoMapper(typeof(Program).Assembly)
+               .AddUserActivityTracker();
+  
   private static IServiceCollection AddSqliteDbContext(this IServiceCollection services, IConfiguration configuration)
     => services.AddDbContext<DataContext>(options =>
-      options.UseSqlite(configuration.GetSqliteConnectionString()));
-  #endregion
+        options.UseSqlite(configuration.GetSqliteConnectionString()));
+  
+  private static IServiceCollection AddRepositories(this IServiceCollection services)
+    => services.AddScoped<IUserRepository, UserRepository>()
+               .AddScoped<ILikesRepository, LikeRepository>()
+               .AddScoped<IMessagesRepository, MessageRepository>();
 
-  #region Repositories
-  private static IServiceCollection AddUserRepository(this IServiceCollection services)
-    => services.AddScoped<IUserRepository, UserRepository>();
+  private static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    => services.AddScoped<ITokenService, TokenService>()
+               .AddCloudinaryPhotoService(configuration);
   
-  private static IServiceCollection AddLikesRepository(this IServiceCollection services)
-    => services.AddScoped<ILikesRepository, LikeRepository>();
-  
-  private static IServiceCollection AddMessagesRepository(this IServiceCollection services)
-    => services.AddScoped<IMessagesRepository, MessageRepository>();
-  #endregion
+  private static IServiceCollection AddCloudinaryPhotoService(this IServiceCollection services, IConfiguration configuration) 
+    => services.Configure<CloudinaryOptions>(configuration.GetCloudinarySection())
+               .AddScoped<IPhotoService, CloudinaryPhotoService>();
 
-  #region Services
-  private static IServiceCollection AddDefaultJwtTokenService(this IServiceCollection services)
-    => services.AddScoped<ITokenService, TokenService>();
+  public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)
+    => services.AddIdentityCore<DbUser>(options => {
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 8;
+      })
+        .AddRoles<DbRole>()
+        .AddRoleManager<RoleManager<DbRole>>()
+        .AddEntityFrameworkStores<DataContext>().Services
+      .AddDefaultJwtAuthentication(configuration)
+      .AddAuthorizationBuilder()
+        .AddPolicy("RequireAdminRole", policy => policy.RequireRole("Admin"))
+        .AddPolicy("ModeratePhotoRole", policy => policy.RequireRole("Admin", "Moderator")).Services;
   
-  private static IServiceCollection ConfigureCloudinary(this IServiceCollection services, IConfiguration configuration) 
-    => services.Configure<CloudinaryOptions>(configuration.GetCloudinarySection());
   
-  private static IServiceCollection AddCloudinaryPhotoService(this IServiceCollection services) 
-    => services.AddScoped<IPhotoService, CloudinaryPhotoService>();  
-  #endregion
-
-  #region Authentication
   private static IServiceCollection AddDefaultJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     => services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
       .AddJwtBearer(options => {
@@ -70,10 +69,7 @@ public static class ServiceCollectionExtensions {
           ValidateAudience = false
         };
       }).Services;  
-  #endregion
   
-  #region Other
   private static IServiceCollection AddUserActivityTracker(this IServiceCollection services)
     => services.AddScoped<UserActivityTracker>();
-  #endregion
 }

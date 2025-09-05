@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { LoggedInUser } from '../_models/logged-in-user';
 import { LoginForm } from '../_models/login-form';
 import { map } from 'rxjs';
@@ -21,7 +21,13 @@ export class AccountService {
   private messagesCache = inject(MessagesCacheService);
   private likesService = inject(LikesService);
   baseUrl = environment.apiUrl;
-  currentUser = signal<LoggedInUser | null>(null);
+  currentUser = signal<LoggedInUser | undefined>(undefined);
+  currentRoles = computed(() => {
+    var user = this.currentUser();
+    if(!user) return [];
+    var roles = JSON.parse(atob(user.token.split(".")[1])).role;
+    return Array.isArray(roles) ? roles : [roles];
+  });
 
   login(model: LoginForm) {
     return this.http.post<LoggedInUser>(this.baseUrl + "/account/login", model).pipe(map(
@@ -56,7 +62,7 @@ export class AccountService {
 
   unsetCurrentUser() {
     localStorage.removeItem("user");
-    this.currentUser.set(null);
+    this.currentUser.set(undefined);
     this.usersCache.clearAll();
     this.likesCache.clearAll();
     this.messagesCache.clearAll();

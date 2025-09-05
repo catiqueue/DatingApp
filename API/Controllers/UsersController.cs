@@ -16,7 +16,7 @@ namespace API.Controllers;
 
 [Authorize]
 public class UsersController(IUserRepository users, IMapper mapper, IPhotoService photoService) : ApiControllerBase {
-
+  
   [HttpGet]
   public async Task<ActionResult<PaginatedResponse<SimpleUser>>> GetUsers([FromQuery] GetUsersRequest request) =>
     PaginationInfo.TryCreate(request.ToPage(), await users.CountAsync(request.ToFilter(User.GetUsername())), out var paginationInfo)
@@ -31,10 +31,10 @@ public class UsersController(IUserRepository users, IMapper mapper, IPhotoServic
   [HttpGet("{id:int}")] 
   public async Task<ActionResult<SimpleUser>> GetUser(uint id) 
     => await users.GetDbUserAsync(id) is null ? NotFound() : Ok(await users.GetSimpleUserAsync(id));
-
+  
   [HttpGet("{username}")] 
   public async Task<ActionResult<SimpleUser>> GetUser(string username) 
-    => await users.GetDbUserAsync(username) is null ? NotFound() : Ok(await users.GetSimpleUserAsync(username));
+    => await users.GetSimpleUserAsync(username) is { } simpleUser ? Ok(simpleUser) : NotFound();
 
   [HttpPut]
   public async Task<ActionResult> UpdateUser(UpdateUserRequest request) {
