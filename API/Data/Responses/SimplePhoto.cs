@@ -1,4 +1,4 @@
-﻿namespace API.Data.DTOs;
+﻿namespace API.Data.Responses;
 
 public class SimplePhoto {
   public uint Id { get; init; }

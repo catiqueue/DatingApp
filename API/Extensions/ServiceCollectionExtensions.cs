@@ -7,6 +7,8 @@ public static class ServiceCollectionExtensions {
                .AddControllers().Services
                .AddServices(configuration)
                .AddRepositories()
+               .AddRepositoryFactory()
+               .AddUnitOfWork()
                .AddAutoMapper(typeof(Program).Assembly)
                .AddSignalR().Services
                .AddPresenceTracker()

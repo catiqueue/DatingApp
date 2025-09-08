@@ -1,5 +1,4 @@
-﻿using API.Data.DTOs;
-using API.Data.Requests;
+﻿using API.Data.Requests;
 using API.Data.Responses;
 using API.Entities;
 

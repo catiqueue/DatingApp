@@ -1,7 +1,5 @@
 ﻿using System.Security.Claims;
 
-using Microsoft.IdentityModel.JsonWebTokens;
-
 namespace API.Extensions;
 
 public static class ClaimsPrincipalExtensions {

@@ -1,7 +1,7 @@
 ﻿using API.Data.Responses;
 using API.Entities;
 using API.Helpers;
-using API.Services.Abstractions;
+using API.Services.Abstractions.Repositories;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -12,8 +12,6 @@ namespace API.Data.Repositories;
 
 public class UserRepository(DataContext db, IMapper mapper) : IUserRepository {
   public void Update(DbUser user) => db.Entry(user).State = EntityState.Modified;
-
-  public async Task<bool> TrySaveAllAsync() => await db.SaveChangesAsync() > 0;
   
   public async Task<int> CountAsync(UserFilter filter) => await DbUsers(tracking: false).Filter(filter).CountAsync();
 

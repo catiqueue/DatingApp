@@ -3,10 +3,9 @@ using API.Data.Responses;
 using API.Entities;
 using API.Helpers;
 
-namespace API.Services.Abstractions;
+namespace API.Services.Abstractions.Repositories;
 
-public interface ILikesRepository {
-  Task<bool> TrySaveAllAsync();
+public interface ILikesRepository : IRepository {
   Task<int> CountAsync(LikedListType request, uint userId);
   void AddLike(DbUserLike like);
   void DeleteLike(DbUserLike like);

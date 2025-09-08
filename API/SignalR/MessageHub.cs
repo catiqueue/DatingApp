@@ -3,7 +3,6 @@ using API.Data.Responses;
 using API.Entities;
 using API.Extensions;
 using API.Services.Abstractions;
-using API.Services.Abstractions.Repositories;
 
 using AutoMapper;
 
@@ -13,8 +12,7 @@ using static API.SignalR.Utils;
 
 namespace API.SignalR;
 
-public sealed class MessageHub(IMessagesRepository messages, IUserRepository users, 
-                                  IMapper mapper, IHubContext<PresenceHub> presence, IPresenceTracker presenceTracker) : Hub {
+public sealed class MessageHub(IUnitOfWork work, IMapper mapper, IHubContext<PresenceHub> presence, IPresenceTracker presenceTracker) : Hub {
   
   public override async Task OnConnectedAsync() {
     var httpContext = Context.GetHttpContext();
@@ -24,7 +22,7 @@ public sealed class MessageHub(IMessagesRepository messages, IUserRepository use
     await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
     if (await AddToGroup(groupName, sender, Context.ConnectionId) is { } group)
       await Clients.Group(groupName).SendAsync("OnGroupUpdated", group);
-    await Clients.Caller.SendAsync("OnMessageThreadReceived", await messages.GetMessageThread(sender, recipient));
+    await Clients.Caller.SendAsync("OnMessageThreadReceived", await work.Messages.GetMessageThread(sender, recipient));
   }
   
   public async Task OnMessageSent(CreateMessageRequest request) {
@@ -34,8 +32,8 @@ public sealed class MessageHub(IMessagesRepository messages, IUserRepository use
       throw new HubException("Cannot send a message: one or both participants are missing.");
     var groupName = GetGroupName(sender, request.RecipientUsername);
     
-    if(await users.GetDbUserAsync(request.RecipientUsername) is not { UserName: not null } recipientUser 
-        || await users.GetDbUserAsync(sender) is not { UserName: not null } senderUser)
+    if(await work.Users.GetDbUserAsync(request.RecipientUsername) is not { UserName: not null } recipientUser 
+        || await work.Users.GetDbUserAsync(sender) is not { UserName: not null } senderUser)
       throw new HubException("Cannot send a message: one or both participants do not exist.");
 
     var message = new DbMessage {
@@ -48,7 +46,7 @@ public sealed class MessageHub(IMessagesRepository messages, IUserRepository use
       Content = request.Content
     };
     
-    if(await messages.GetGroup(groupName) is { } group 
+    if(await work.Messages.GetGroup(groupName) is { } group 
         && group.Connections.Any(connection => connection.Username == request.RecipientUsername)) {
       message.ReadAt = DateTime.UtcNow;
     } else if(await presenceTracker.IsOnline(request.RecipientUsername)) {
@@ -56,28 +54,28 @@ public sealed class MessageHub(IMessagesRepository messages, IUserRepository use
         .SendAsync("OnNewMessageReceived", new { username = senderUser.UserName, knownAs = senderUser.KnownAs });
     }
     
-    messages.AddMessage(message);
+    work.Messages.AddMessage(message);
     
-    if(await messages.TrySaveAllAsync())
+    if(await work.TrySaveAllAsync())
       await Clients.Group(groupName).SendAsync("OnMessageReceived", mapper.Map<SimpleMessage>(message));
   }
 
   private async Task<DbGroup?> AddToGroup(string groupName, string username, string connectionId) {
-    if (await messages.GetGroup(groupName) is not { } group) {
+    if (await work.Messages.GetGroup(groupName) is not { } group) {
       group = new DbGroup { Name = groupName };
-      messages.AddGroup(group);
+      work.Messages.AddGroup(group);
     }
     group.Connections.Add(new DbGroupConnection { ConnectionId = connectionId, Username = username });
-    return await messages.TrySaveAllAsync() ? group : throw new HubException("Failed to add to a group.");
+    return await work.TrySaveAllAsync() ? group : throw new HubException("Failed to add to a group.");
   }
   
   private async Task<DbGroup?> RemoveFromGroup(string connectionId) {
-    if (await messages.GetConnectionGroup(connectionId) is not { } group ||
+    if (await work.Messages.GetConnectionGroup(connectionId) is not { } group ||
         group.Connections.FirstOrDefault(c => c.ConnectionId == connectionId) is not { } connection) 
       return null;
     
-    messages.RemoveConnection(connection);
-    return await messages.TrySaveAllAsync() ? group : throw new HubException("Failed to remove from a group.");
+    work.Messages.RemoveConnection(connection);
+    return await work.TrySaveAllAsync() ? group : throw new HubException("Failed to remove from a group.");
   }
 
   public override async Task OnDisconnectedAsync(Exception? exception) {

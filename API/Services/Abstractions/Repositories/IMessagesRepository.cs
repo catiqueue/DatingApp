@@ -6,8 +6,7 @@ namespace API.Services.Abstractions.Repositories;
 
 public enum MessageBoxFilter { Inbox, Outbox, Unread }
 
-public interface IMessagesRepository {
-  Task<bool> TrySaveAllAsync();
+public interface IMessagesRepository : IRepository {
   Task<int> CountAsync(MessageBoxFilter filter, string recipient);
   void AddMessage(DbMessage message);
   void DeleteMessage(DbMessage message);

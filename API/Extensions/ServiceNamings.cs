@@ -24,6 +24,13 @@ public static class ServiceNamings {
       options.UseSqlite(configuration.GetSqliteConnectionString()));
   
   
+  public static IServiceCollection AddUnitOfWork(this IServiceCollection services) 
+    => services.AddScoped<IUnitOfWork, UnitOfWork>();
+  
+  
+  public static IServiceCollection AddRepositoryFactory(this IServiceCollection services) 
+    => services.AddScoped<IRepositoryFactory, RepositoryFactory>();
+  
   
   public static IServiceCollection AddRepositories(this IServiceCollection services)
     => services.AddScoped<IUserRepository, UserRepository>()

@@ -1,5 +1,4 @@
-﻿using API.Helpers;
-using API.Services.Abstractions.PhotoService;
+﻿using API.Services.Abstractions.PhotoService;
 
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;

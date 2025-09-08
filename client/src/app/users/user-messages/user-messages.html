@@ -5,7 +5,7 @@
     @if(!this.messagesService.messages().length) {
       <p>No messages yet. Start a conversation!</p>
     } @else {
-      <ul class="chat">
+      <ul class="chat" #scrollable style="overflow-y: scroll; max-height: 500px; scroll-behavior: smooth;">
         @for(message of this.messagesService.messages(); track message.id) {
           <li>
             <div>

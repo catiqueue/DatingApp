@@ -1,14 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography;
-using System.Text;
-
-using API.Data;
-using API.Data.DTOs;
-using API.Data.Repositories;
-using API.Data.Requests;
+﻿using API.Data.Requests;
 using API.Data.Responses;
 using API.Entities;
-using API.Services;
 using API.Services.Abstractions;
 
 using AutoMapper;

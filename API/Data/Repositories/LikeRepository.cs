@@ -3,7 +3,7 @@
 using API.Data.Responses;
 using API.Entities;
 using API.Helpers;
-using API.Services.Abstractions;
+using API.Services.Abstractions.Repositories;
 
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -15,7 +15,6 @@ namespace API.Data.Repositories;
 public enum LikedListType { Liked, LikedBy, Mutual }
 
 public sealed class LikeRepository(DataContext db, IMapper mapper) : ILikesRepository {
-  public async Task<bool> TrySaveAllAsync() => await db.SaveChangesAsync() > 0;
   public Task<int> CountAsync(LikedListType request, uint userId) => ReadOnlyLikes.FilterUsers(request, userId).CountAsync();
 
   public void AddLike(DbUserLike like) => db.Likes.Add(like);

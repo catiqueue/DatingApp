@@ -1,15 +1,12 @@
-﻿using API.Data.DTOs;
-using API.Data.Responses;
+﻿using API.Data.Responses;
 using API.Entities;
 using API.Helpers;
 
-namespace API.Services.Abstractions;
+namespace API.Services.Abstractions.Repositories;
 
-// TODO: string overloads don't deserve to live
-public interface IUserRepository {
+// TODO: string overloads should be removed
+public interface IUserRepository : IRepository {
   void Update(DbUser user);
-  
-  Task<bool> TrySaveAllAsync();
 
   Task<int> CountAsync(UserFilter filter);
   

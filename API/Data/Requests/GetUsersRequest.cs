@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using API.Entities;
+﻿using API.Entities;
 using API.Helpers;
 
 namespace API.Data.Requests;

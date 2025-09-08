@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-using Microsoft.AspNetCore.Mvc;
-
 namespace API.Helpers;
 
 public sealed record Page(int PageNumber, int PageSize);

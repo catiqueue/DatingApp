@@ -15,7 +15,6 @@ using static API.Data.Repositories.MessageHelpers;
 namespace API.Data.Repositories;
 
 public class MessageRepository(DataContext db, IMapper mapper) : IMessagesRepository {
-  public async Task<bool> TrySaveAllAsync() => await db.SaveChangesAsync() > 0;
   public async Task<int> CountAsync(MessageBoxFilter filter, string recipient) => await ReadOnlyMessages.Filter(filter, recipient).CountAsync();
   public void AddMessage(DbMessage message) => db.Messages.Add(message);
   public void DeleteMessage(DbMessage message) => db.Messages.Remove(message);
@@ -28,6 +27,9 @@ public class MessageRepository(DataContext db, IMapper mapper) : IMessagesReposi
       .ProjectTo<SimpleMessage>(mapper.ConfigurationProvider)
       .ToListAsync();
 
+  // this method probably doesn't follow the unit of work pattern, 
+  // because it executes the update on the database directly.
+  // but I don't want to refactor this at the moment.
   public async Task<IEnumerable<SimpleMessage>> GetMessageThread(string caller, string other) {
     await ReadOnlyMessages
       .Where(MessageIsFrom(other))

@@ -1,9 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-using API.Extensions;
-using API.Helpers;
-
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
 namespace API.Entities;
 
