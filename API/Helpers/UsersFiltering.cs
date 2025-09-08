@@ -22,5 +22,5 @@ public static class FilteringExtensions {
   private static IQueryable<DbUser> FilterMaxAge(this IQueryable<DbUser> query, int maxAge) 
     => query.Where(u => u.DateOfBirth >= DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-maxAge-1));
   private static IQueryable<DbUser> SkipUsernames(this IQueryable<DbUser> query, IEnumerable<string> skippedUsernames) 
-    => query.Where(u => !skippedUsernames.Select(uname => uname.ToLower()).Contains(u.UserName));
+    => query.Where(u => !skippedUsernames.Select(uname => uname.ToUpperInvariant()).Contains(u.NormalizedUserName));
 }

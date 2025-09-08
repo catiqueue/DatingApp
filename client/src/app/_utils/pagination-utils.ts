@@ -1,16 +1,6 @@
-import { HttpClient, HttpParams, HttpRequest } from "@angular/common/http";
+import { HttpClient, HttpParams } from "@angular/common/http";
 import { WritableSignal } from "@angular/core";
-import { Page, PaginatedResponse, PaginationInfo } from "../_models/pagination";
-
-export function appendHttpParams<T extends Record<string, any>>(params: HttpParams, object: T) {
-  (Object.keys(object)).forEach((key) => {
-    var value = object[key];
-    if (value !== undefined && value !== null) {
-      params = params.append(String(key), String(value));
-    }
-  });
-  return params;
-}
+import { PaginatedResponse, PaginationInfo } from "../_models/pagination";
 
 export function readPaginatedResponse<T>(client: HttpClient, url: string, params: HttpParams, data: WritableSignal<T[]>, pagination: WritableSignal<PaginationInfo | undefined>) {
   client.get<PaginatedResponse<T>>(url, {params: params}).subscribe({

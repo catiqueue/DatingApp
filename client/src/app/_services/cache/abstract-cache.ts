@@ -1,42 +1,73 @@
-import { WritableSignal, signal } from '@angular/core';
+import { signal, WritableSignal } from '@angular/core';
 
-// what
-export abstract class AbstractCache<TSchema extends Record<string, any>> {
-  private map = new Map<keyof TSchema, WritableSignal<TSchema[keyof TSchema]>>();
+const SIGNAL_SYMBOL: unique symbol = (Object.getOwnPropertySymbols(signal(0))
+  .find(sym => sym.toString() === "Symbol(SIGNAL)")!) as any;
 
-  getOrCreate<K extends keyof TSchema>(key: K, factory: () => TSchema[K]): WritableSignal<TSchema[K]> {
-    if(!this.map.get(key)) this.map.set(key, signal(factory()));
-    return this.getSignal(key)!;
+function isWritableSignal<T>(v: MaybeSignal<T>): v is WritableSignal<T> {
+  return (v as any)[SIGNAL_SYMBOL] !== undefined;
+}
+
+type MaybeSignal<T> = T | WritableSignal<T>;
+type UnwrapSignal<T> = T extends WritableSignal<infer U> ? U : T;
+
+function isWritableSignalOld<T>(v: MaybeSignal<T>): v is WritableSignal<T> {
+  return typeof v === 'function'
+  && "set" in v && typeof v.set === 'function'
+  && "update" in v && typeof v.set === 'function';
+}
+
+export type CacheWithGetters<T> = {
+  [K in keyof T]: T[K];
+};
+
+export abstract class AbstractCache<TSchema extends Record<keyof TSchema, MaybeSignal<any>>> {
+  private readonly defaults: TSchema;
+  private state: TSchema;
+
+  constructor(schemaType: new () => TSchema) {
+    this.defaults = new schemaType();
+    this.state = new schemaType();
   }
 
-  getSignal<K extends keyof TSchema>(key: K): WritableSignal<TSchema[K]> | undefined {
-    // is it the compiler that's stupid or i am?
-    return this.map.get(key) as WritableSignal<TSchema[K]> | undefined;
+  get<K extends keyof TSchema>(key: K): TSchema[K] {
+    return this.state[key];
   }
 
-  getValue<K extends keyof TSchema>(key: K): TSchema[K] | undefined {
-    var sig = this.getSignal(key);
-    return sig ? sig() : undefined;
+  getValue<K extends keyof TSchema>(key: K): UnwrapSignal<TSchema[K]> {
+    const curr = this.getInternal(this.state, key);
+    return isWritableSignal(curr) ? curr() : curr;
   }
 
-  set<K extends keyof TSchema>(key: K, value: TSchema[K]) {
-    var sig = this.getSignal(key);
-    if(sig) sig.set(value);
-    else this.map.set(key, signal(value));
+  set<K extends keyof TSchema>(key: K, value: UnwrapSignal<TSchema[K]>): void {
+    const curr = this.getInternal(this.state, key);
+
+    if(isWritableSignal(curr)) { curr.set(value); console.log(curr()); }
+    else { this.state[key] = value; console.log(curr); }
   }
 
-  update<K extends keyof TSchema>(key: K, updater: Partial<TSchema[K]> | ((current: TSchema[K]) => TSchema[K])) {
-    var signal = this.getSignal(key);
-    if(!signal) return;
-    var current = signal();
+  reset<K extends keyof TSchema>(key: K): void {
+    const defaultValue = this.getInternal(this.defaults, key);
 
-    if (typeof updater === "function") {
-      signal.set(updater(current));
-    } else if (current !== undefined) {
-      signal.set({ ...current, ...updater } as TSchema[K]);
-    } else {
-      signal.set(updater as TSchema[K]);
+    if(isWritableSignal(defaultValue)) { this.set(key, defaultValue()); console.log(defaultValue()); }
+    else { this.set(key, defaultValue); console.log(defaultValue); }
+  }
+
+  update<K extends keyof TSchema>(key: K, updater: (current: UnwrapSignal<TSchema[K]>) => UnwrapSignal<TSchema[K]>): void {
+    const curr = this.getInternal(this.state, key);
+
+    if (isWritableSignal(curr)) { curr.update(updater); }
+    else { this.state[key] = updater(curr) as TSchema[K]; }
+  }
+
+  clearAll(): void {
+    console.log("clearing");
+    for (const key of Object.keys(this.defaults) as (keyof TSchema)[]) {
+      console.log(key);
+      this.reset(key);
     }
   }
-  abstract clearAll(): void;
+
+  private getInternal<K extends keyof TSchema>(from: TSchema, key: K) : MaybeSignal<UnwrapSignal<TSchema[K]>> {
+    return from[key];
+  }
 }

@@ -14,4 +14,9 @@ public interface IMessagesRepository {
   Task<DbMessage?> GetMessage(uint id);
   Task<IEnumerable<SimpleMessage>> GetUserMessages(Page page, MessageBoxFilter filter, string username);
   Task<IEnumerable<SimpleMessage>> GetMessageThread(string caller, string other);
+  void AddGroup(DbGroup group);
+  void RemoveConnection(DbGroupConnection connection);
+  Task<DbGroupConnection?> GetConnection(string connectionId);
+  Task<DbGroup?> GetGroup(string groupName);
+  Task<DbGroup?> GetConnectionGroup(string connectionId);
 }

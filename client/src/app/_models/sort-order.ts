@@ -1,6 +1,6 @@
 export enum SortOrder {
-  KnownAs = "knownAs",
-  DateOfBirth = "dateOfBirth",
-  CreatedAt = "createdAt",
-  LastActive = "lastActive"
+  KnownAs = "KnownAs",
+  DateOfBirth = "DateOfBirth",
+  CreatedAt = "CreatedAt",
+  LastActive = "LastActive"
 }

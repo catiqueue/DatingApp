@@ -9,6 +9,7 @@ import { UsersCacheService } from './cache/users-cache';
 import { LikesCacheService } from './cache/likes-cache';
 import { LikesService } from './likes-service';
 import { MessagesCacheService } from './cache/messages-cache';
+import { PresenceService } from './presence-service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,17 +20,21 @@ export class AccountService {
   private usersCache = inject(UsersCacheService);
   private likesCache = inject(LikesCacheService);
   private messagesCache = inject(MessagesCacheService);
+
   private likesService = inject(LikesService);
-  baseUrl = environment.apiUrl;
-  currentUser = signal<LoggedInUser | undefined>(undefined);
-  currentRoles = computed(() => {
+  private presenceService = inject(PresenceService);
+
+  private baseUrl = environment.apiUrl;
+
+  public currentUser = signal<LoggedInUser | undefined>(undefined);
+  public currentRoles = computed(() => {
     var user = this.currentUser();
     if(!user) return [];
     var roles = JSON.parse(atob(user.token.split(".")[1])).role;
     return Array.isArray(roles) ? roles : [roles];
   });
 
-  login(model: LoginForm) {
+  public login(model: LoginForm) {
     return this.http.post<LoggedInUser>(this.baseUrl + "/account/login", model).pipe(map(
       user => {
         if(user) this.setCurrentUser(user)
@@ -38,7 +43,7 @@ export class AccountService {
     ));
   }
 
-  register(model: any) {
+  public register(model: any) {
     return this.http.post<LoggedInUser>(this.baseUrl + "/account/register", model).pipe(map(
       user => {
         if(user) this.setCurrentUser(user)
@@ -47,25 +52,38 @@ export class AccountService {
     ));
   }
 
-  setCurrentUser(user: LoggedInUser) {
-    localStorage.setItem("user", JSON.stringify(user));
-    this.currentUser.set(user);
+  private postAuthenticationAction() {
+    this.presenceService.createHubConnection(this.currentUser()!);
     this.likesService.loadLikedIds();
   }
 
-  setAvatar(photo: Photo) {
+  public loadCurrentUser() {
+    var userString = localStorage.getItem("user");
+    if(!userString) return;
+    var user: LoggedInUser = JSON.parse(userString);
+    this.currentUser.set(user);
+    this.postAuthenticationAction();
+  }
+
+  private setCurrentUser(user: LoggedInUser) {
+    localStorage.setItem("user", JSON.stringify(user));
+    this.currentUser.set(user);
+    this.postAuthenticationAction();
+  }
+
+  public setAvatar(photo: Photo) {
     if(!this.currentUser()) return;
     var updated = {...this.currentUser()!};
     updated.avatarUrl = photo.url;
     this.setCurrentUser(updated);
   }
 
-  unsetCurrentUser() {
+  public unsetCurrentUser() {
     localStorage.removeItem("user");
     this.currentUser.set(undefined);
     this.usersCache.clearAll();
     this.likesCache.clearAll();
     this.messagesCache.clearAll();
-
+    this.presenceService.closeHubConnection();
   }
 }

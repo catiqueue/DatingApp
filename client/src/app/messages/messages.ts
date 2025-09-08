@@ -1,6 +1,5 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { MessagesService } from '../_services/messages-service';
-import { MessagesCacheService } from '../_services/cache/messages-cache';
 import { ButtonsModule } from "ngx-bootstrap/buttons";
 import { FormsModule } from '@angular/forms';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
@@ -8,18 +7,18 @@ import { MessageBoxType } from '../_models/message-box';
 import { TimeagoModule } from 'ngx-timeago';
 import { Message } from '../_models/message';
 import { RouterLink } from '@angular/router';
-import { setPageToOne } from '../_services/pagination-utils';
+import { setPageToOne } from '../_utils/pagination-utils';
 
 @Component({
   selector: 'app-messages',
   imports: [ButtonsModule, FormsModule, PaginationModule, TimeagoModule, RouterLink, PaginationModule],
   templateUrl: './messages.html',
+  standalone: true,
   styleUrl: './messages.css'
 })
 export class Messages implements OnInit {
-  protected messagesService = inject(MessagesService);
-  protected messagesCache = inject(MessagesCacheService);
-  isOutbox = this.messagesCache.box() === MessageBoxType.Outbox;
+  protected messagesService = inject(MessagesService)
+  isOutbox = this.messagesService.box() === MessageBoxType.Outbox;
 
   ngOnInit(): void {
     this.messagesService.loadMessages();
@@ -28,7 +27,7 @@ export class Messages implements OnInit {
   deleteMessage(id: number) {
     this.messagesService.deleteMessage(id).subscribe({
       next: _ => {
-        this.messagesCache.messages.update(arr => arr.filter(mess => mess.id != id));
+        this.messagesService.messages.update(arr => arr.filter(mess => mess.id != id));
 
       }
     });
@@ -41,16 +40,16 @@ export class Messages implements OnInit {
   }
 
   onFilterChanged() {
-    this.messagesCache.pagination.update(prev => setPageToOne(prev));
+    this.messagesService.pagination.update(prev => setPageToOne(prev));
     this.messagesService.loadMessages();
   }
 
   onPageChanged(event: any) {
-    var pagination = this.messagesCache.pagination();
+    var pagination = this.messagesService.pagination();
     if(!pagination) return;
     if(pagination.current.pageNumber === event.page) return;
     pagination.current.pageNumber = event.page;
-    this.messagesCache.pagination.set(pagination);
+    this.messagesService.pagination.set(pagination);
     this.messagesService.loadMessages();
   }
 }

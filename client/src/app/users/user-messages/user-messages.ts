@@ -1,5 +1,4 @@
-import { Component, inject, input, OnInit, output, ViewChild } from '@angular/core';
-import { Message } from '../../_models/message';
+import { Component, inject, input, ViewChild } from '@angular/core';
 import { MessagesService } from '../../_services/messages-service';
 import { TimeagoModule } from 'ngx-timeago';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -13,18 +12,12 @@ import { FormsModule, NgForm } from '@angular/forms';
 })
 export class UserMessagesComponent {
   @ViewChild("messageForm") messageForm?: NgForm;
-  username = input.required<string>();
-  messages = input.required<Message[]>();
-  messagesService = inject(MessagesService);
-  messageReceivedEvent = output<Message>();
-  messageContent: string = "";
+  public username = input.required<string>();
+  protected messagesService = inject(MessagesService);
+  protected messageContent: string = "";
 
-  sendMessage() {
-    this.messagesService.sendMessage(this.username(), this.messageContent).subscribe({
-      next: message => {
-        this.messageReceivedEvent.emit(message)
-        this.messageForm?.reset();
-      }
-    });
+  public sendMessage() {
+    this.messagesService.sendMessage(this.username(), this.messageContent)
+      .then(() => this.messageForm?.reset());
   }
 }

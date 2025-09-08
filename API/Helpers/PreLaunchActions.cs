@@ -7,8 +7,12 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Helpers;
 
 public static class PreLaunchActions {
+  public static async Task ClearConnections(IServiceScope scope)
+    => await scope.ServiceProvider.GetRequiredService<DataContext>().Connections.ExecuteDeleteAsync();
+  
   public static async Task ApplyMigrations(IServiceScope scope) 
     => await scope.ServiceProvider.GetRequiredService<DataContext>().Database.MigrateAsync();
+  
   public static Task SeedUsers(IServiceScope scope) 
     => Seed.SeedUsers(scope.ServiceProvider.GetRequiredService<UserManager<DbUser>>(), 
                       scope.ServiceProvider.GetRequiredService<RoleManager<DbRole>>());

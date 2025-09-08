@@ -1,37 +1,35 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 import { LikesService } from '../_services/likes-service';
-import { User } from '../_models/user';
 import { LikedListType } from '../_models/likes-request';
 import { ButtonsModule } from "ngx-bootstrap/buttons";
 import { FormsModule } from '@angular/forms';
 import { UserCard } from "../users/user-card/user-card";
-import { LikesCacheService } from '../_services/cache/likes-cache';
 import { PaginationModule } from 'ngx-bootstrap/pagination';
-import { setPageToOne } from '../_services/pagination-utils';
+import { setPageToOne } from '../_utils/pagination-utils';
 
 @Component({
   selector: 'app-lists',
   imports: [ButtonsModule, FormsModule, UserCard, PaginationModule],
   templateUrl: './lists.html',
+  standalone: true,
   styleUrl: './lists.css'
 })
 export class Lists implements OnInit, OnDestroy {
-  private likesService = inject(LikesService);
-  protected likesCache = inject(LikesCacheService);
+  protected likesService = inject(LikesService);
 
   ngOnInit(): void {
-    if(!this.likesCache.users()?.length) {
-      this.likesCache.pagination.set(undefined);
+    if(!this.likesService.users()?.length) {
+      this.likesService.pagination.set(undefined);
       this.likesService.loadLikedList();
     }
   }
 
   ngOnDestroy(): void {
-    this.likesCache.users.set([]);
+    this.likesService.users.set([]);
   }
 
   getTitle() {
-    switch(this.likesCache.predicate()) {
+    switch(this.likesService.predicate()) {
       case LikedListType.Liked: return "Users who you liked"
       case LikedListType.LikedBy: return "Users who liked you"
       case LikedListType.Mutual: return "Users who you liked and they liked you"
@@ -39,16 +37,16 @@ export class Lists implements OnInit, OnDestroy {
   }
 
   onFilterChanged() {
-    this.likesCache.pagination.update(prev => setPageToOne(prev));
+    this.likesService.pagination.update(prev => setPageToOne(prev));
     this.likesService.loadLikedList();
   }
 
   onPageChanged(event: any) {
-    var pagination = this.likesCache.pagination();
+    var pagination = this.likesService.pagination();
     if(!pagination) return;
     if(pagination.current.pageNumber === event.page) return;
     pagination.current.pageNumber = event.page;
-    this.likesCache.pagination.set(pagination);
+    this.likesService.pagination.set(pagination);
     this.likesService.loadLikedList();
   }
 }

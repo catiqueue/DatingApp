@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
   selector: 'app-register',
   imports: [ReactiveFormsModule, TextInput, DatePicker],
   templateUrl: './register.html',
+  standalone: true,
   styleUrl: './register.css'
 })
 export class Register implements OnInit {

@@ -5,10 +5,10 @@ import { NgxSpinnerService } from 'ngx-spinner';
   providedIn: 'root'
 })
 export class LoadingService {
-  requestCount = 0;
+  private requestCount = 0;
   private spinnerService = inject(NgxSpinnerService);
 
-  startLoading() {
+  public startLoading() {
     this.requestCount++;
     this.spinnerService.show(undefined, {
       type: "cube-transition",
@@ -17,7 +17,7 @@ export class LoadingService {
     })
   }
 
-  finishLoading() {
+  public finishLoading() {
     this.requestCount--
     if(!this.requestCount) {
       this.spinnerService.hide();

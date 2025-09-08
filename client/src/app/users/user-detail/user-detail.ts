@@ -1,36 +1,37 @@
-import { AfterContentInit, AfterViewChecked, AfterViewInit, ChangeDetectorRef, Component, inject, OnInit, ViewChild } from '@angular/core';
-import { UsersService } from '../../_services/users-service';
-import { ActivatedRoute } from '@angular/router';
+import { AfterViewInit, ChangeDetectorRef, Component, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {ActivatedRoute, Router} from '@angular/router';
 import { User } from '../../_models/user';
 import { TabDirective, TabsetComponent, TabsModule } from 'ngx-bootstrap/tabs';
 import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
-import { TimeagoModule, TimeagoPipe } from 'ngx-timeago';
+import { TimeagoModule } from 'ngx-timeago';
 import { DatePipe } from '@angular/common';
 import { UserMessagesComponent } from "../user-messages/user-messages";
-import { Message } from '../../_models/message';
 import { MessagesService } from '../../_services/messages-service';
 import { LikesService } from '../../_services/likes-service';
-import { LikesCacheService } from '../../_services/cache/likes-cache';
+import { PresenceService } from '../../_services/presence-service';
+import { AccountService } from '../../_services/account-service';
+import { HubConnectionState } from '@microsoft/signalr';
 
 @Component({
   selector: 'app-user-detail',
   imports: [TabsModule, GalleryModule, TimeagoModule, DatePipe, UserMessagesComponent],
   templateUrl: './user-detail.html',
+  standalone: true,
   styleUrl: './user-detail.css'
 })
-export class UserDetail implements OnInit, AfterViewInit {
+export class UserDetail implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild("userTabs", {static: true}) userTabs?: TabsetComponent;
-  private userService = inject(UsersService);
   private messagesService = inject(MessagesService);
+  private accountService = inject(AccountService);
   private likesService = inject(LikesService);
-  private likesCache = inject(LikesCacheService);
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private cdRef = inject(ChangeDetectorRef);
+  protected presenceService = inject(PresenceService);
   user: User = {} as User;
   images: GalleryItem[] = [];
   activeTab?: TabDirective;
   routeTabName?: string;
-  messages: Message[] = [];
 
   ngOnInit(): void {
     this.route.data.subscribe({
@@ -42,6 +43,10 @@ export class UserDetail implements OnInit, AfterViewInit {
       }
     });
 
+    this.route.paramMap.subscribe({
+      next: _ => this.onRouteChanged()
+    });
+
     this.route.queryParams.subscribe({
       next: params => this.routeTabName = params["tab"]
     });
@@ -51,9 +56,8 @@ export class UserDetail implements OnInit, AfterViewInit {
     if(this.routeTabName) this.selectTab(this.routeTabName);
   }
 
-
   public get liked(): boolean {
-    return this.likesCache.likedIds().includes(this.user.id);
+    return this.likesService.likedIds().includes(this.user.id);
   }
 
   toggleLike() {
@@ -63,32 +67,46 @@ export class UserDetail implements OnInit, AfterViewInit {
       }
     });
   }
+
   private addLike() {
-    this.likesCache.likedIds.update(values => values.concat(this.user.id))
+    this.likesService.likedIds.update(values => values.concat(this.user.id))
   }
   private removeLike() {
-    this.likesCache.likedIds.update(values => values.filter(value => value !== this.user.id))
+    this.likesService.likedIds.update(values => values.filter(value => value !== this.user.id))
   }
-
 
   selectTab(heading: string) {
     if(!this.userTabs) return;
-    var requestedTab = this.userTabs.tabs.find(tab => tab.heading === heading);
+    const requestedTab = this.userTabs.tabs.find(tab => tab.heading === heading);
     if(!requestedTab) return;
     requestedTab.active = true;
     this.cdRef.detectChanges();
   }
 
-  onTabActivated(which: TabDirective) {
-    this.activeTab = which;
-    if(this.activeTab.heading === "Messages" && !this.messages.length && this.user) {
-      this.messagesService.getMessageThread(this.user.userName).subscribe({
-        next: response => this.messages = response
+  onRouteChanged() {
+    const currentUser = this.accountService.currentUser();
+    if(this.messagesService.connectionState === HubConnectionState.Connected
+        && this.activeTab?.heading === "Messages" && currentUser) {
+      this.messagesService.closeHubConnection().then(async () => {
+        await this.messagesService.createHubConnection(currentUser, this.user.userName)
       });
     }
   }
 
-  onMessageReceived(message: Message) {
-    this.messages.push(message);
+  async onTabActivated(which: TabDirective) {
+    this.activeTab = which;
+    await this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {tab: which.heading},
+      queryParamsHandling: "merge"
+    });
+    const currentUser = this.accountService.currentUser();
+    if (this.activeTab.heading === "Messages" && this.user && currentUser) {
+      await this.messagesService.createHubConnection(currentUser, this.user.userName);
+    } else await this.messagesService.closeHubConnection();
+  }
+
+  ngOnDestroy(): void {
+    this.messagesService.closeHubConnection();
   }
 }

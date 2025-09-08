@@ -29,21 +29,34 @@ public class MessageRepository(DataContext db, IMapper mapper) : IMessagesReposi
       .ToListAsync();
 
   public async Task<IEnumerable<SimpleMessage>> GetMessageThread(string caller, string other) {
-    await db.Messages
+    await ReadOnlyMessages
       .Where(MessageIsFrom(other))
       .Where(MessageIsTo(caller))
       .Where(MessageIsUnread)
       .ExecuteUpdateAsync(setter => setter.SetProperty(message => message.ReadAt, _ => DateTime.UtcNow));
     
     return await ReadOnlyMessages
-      .Include(message => message.Sender).ThenInclude(sender => sender.Photos)
-      .Include(message => message.Recipient).ThenInclude(recipient => recipient.Photos)
       .Where(MessageIsFromThread(caller, other))
       .OrderBy(message => message.SentAt)
       .ProjectTo<SimpleMessage>(mapper.ConfigurationProvider)
       .ToListAsync();
   }
+
+  public void AddGroup(DbGroup group) => db.Groups.Add(group);
+
+  public void RemoveConnection(DbGroupConnection connection) => db.Connections.Remove(connection);
+
+  public async Task<DbGroupConnection?> GetConnection(string connectionId) 
+    => await db.Connections.FindAsync(connectionId);
+
+  public async Task<DbGroup?> GetGroup(string groupName) 
+    => await db.Groups.Include(group => group.Connections)
+                      .FirstOrDefaultAsync(group => group.Name == groupName);
   
+  public async Task<DbGroup?> GetConnectionGroup(string connectionId)
+    => await db.Groups.Include(group => group.Connections)
+                      .FirstOrDefaultAsync(group => group.Connections.Any(connection => connection.ConnectionId == connectionId));
+
   private IQueryable<DbMessage> ReadOnlyMessages => db.Messages.AsNoTracking();
 }
 

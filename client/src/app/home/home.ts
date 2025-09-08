@@ -5,6 +5,7 @@ import { Register } from "../register/register";
   selector: 'app-home',
   imports: [Register],
   templateUrl: './home.html',
+  standalone: true,
   styleUrl: './home.css'
 })
 export class Home {

@@ -1,5 +1,5 @@
 export enum LikedListType {
-  Liked = "liked",
-  LikedBy = "likedBy",
-  Mutual = "mutual"
-};
+  Liked = "Liked",
+  LikedBy = "LikedBy",
+  Mutual = "Mutual"
+}

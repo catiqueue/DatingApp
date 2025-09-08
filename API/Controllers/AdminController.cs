@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-using API.Entities;
+﻿using API.Entities;
 using API.Helpers;
 
 using Microsoft.AspNetCore.Authorization;
@@ -39,7 +37,7 @@ public class AdminController(UserManager<DbUser> userManager) : ApiControllerBas
       : BadRequest("Failed to update the roles.");
   }
   
-  [Authorize(Policy = "ModeratePhotoRole")]
-  [HttpGet("photos-to-moderate")]
-  public async Task<ActionResult> GetPhotosForModeration() => Ok("Photo moderator secret");
+  // [Authorize(Policy = "ModeratePhotoRole")]
+  // [HttpGet("photos-to-moderate")]
+  // public async Task<ActionResult> GetPhotosForModeration() => Ok("Photo moderator secret");
 }

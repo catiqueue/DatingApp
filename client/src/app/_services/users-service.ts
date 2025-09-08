@@ -3,22 +3,30 @@ import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { User } from '../_models/user';
 import { Photo } from '../_models/photo';
-import { Page, PaginationInfo } from '../_models/pagination';
+import { Page } from '../_models/pagination';
 import { FilterParams } from '../_models/filer-params';
 import { SortOrder } from '../_models/sort-order';
-import { UsersCacheService } from './cache/users-cache';
-import { readPaginatedResponse, appendHttpParams } from './pagination-utils';
+import { UsersCacheSchema, UsersCacheService } from './cache/users-cache';
+import { readPaginatedResponse } from '../_utils/pagination-utils';
+import { CacheWithGetters } from './cache/abstract-cache';
+import { appendHttpParams } from '../_utils/http-utils';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UsersService {
+export class UsersService implements CacheWithGetters<UsersCacheSchema> {
   private http = inject(HttpClient);
   private cache = inject(UsersCacheService);
-  baseUrl = environment.apiUrl;
+  private baseUrl = environment.apiUrl;
+
+  public get users() { return this.cache.users; }
+  public get pagination() { return this.cache.pagination; }
+  public get filter() { return this.cache.filter; }
+  public get sortOrder() { return this.cache.sortOrder; }
+  public clearFilters() { this.cache.clearFilters(); }
 
   public loadUsers() {
-    this.loadUsersInternal(this.cache.pagination()?.current, this.cache.filter(), this.cache.sortOrder());
+    this.loadUsersInternal(this.pagination()?.current, this.filter(), this.sortOrder());
   }
 
   private loadUsersInternal(page?: Page, filter?: FilterParams, order?: SortOrder) {
@@ -26,26 +34,26 @@ export class UsersService {
     if(page) queryParams = appendHttpParams(queryParams, page);
     if(filter) queryParams = appendHttpParams(queryParams, filter);
     if(order) queryParams = queryParams.append("orderBy", order);
-    readPaginatedResponse(this.http, this.baseUrl + "/users", queryParams, this.cache.users, this.cache.pagination);
+    readPaginatedResponse(this.http, this.baseUrl + "/users", queryParams, this.users, this.pagination);
   }
 
-  getUserByUsername(username: string) {
+  public getUserByUsername(username: string) {
     return this.http.get<User>(this.baseUrl + "/users/" + username);
   }
 
-  getUserById(id: number) {
+  public getUserById(id: number) {
     return this.http.get<User>(this.baseUrl + "/users/" + id);
   }
 
-  updateUser(user: User) {
+  public updateUser(user: User) {
     return this.http.put(this.baseUrl + "/users", user);
   }
 
-  setMainPhoto(photo: Photo) {
+  public setMainPhoto(photo: Photo) {
     return this.http.put(this.baseUrl + "/users/set-main-photo/" + photo.id, {});
   }
 
-  deletePhoto(photo: Photo) {
+  public deletePhoto(photo: Photo) {
     return this.http.delete(this.baseUrl + "/users/delete-photo/" + photo.id);
   }
 }

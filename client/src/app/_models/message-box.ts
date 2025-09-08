@@ -1,5 +1,5 @@
 export enum MessageBoxType {
-  Unread = "unread",
-  Outbox = "outbox",
-  Inbox = "inbox"
+  Unread = "Unread",
+  Outbox = "Outbox",
+  Inbox = "Inbox"
 }

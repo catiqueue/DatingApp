@@ -3,7 +3,6 @@ import { User } from '../../_models/user';
 import { FileUploader, FileUploadModule } from 'ng2-file-upload';
 import { AccountService } from '../../_services/account-service';
 import { environment } from '../../../environments/environment';
-import { pipe } from 'rxjs';
 import { DecimalPipe } from '@angular/common';
 import { Photo } from '../../_models/photo';
 import { UsersService } from '../../_services/users-service';

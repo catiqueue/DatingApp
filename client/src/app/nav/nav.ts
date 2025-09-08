@@ -12,6 +12,7 @@ import { HasRoleDirective } from '../_directives/has-role-directive';
   selector: 'app-nav',
   imports: [RouterLink, RouterLinkActive, FormsModule, BsDropdownModule, TitleCasePipe, HasRoleDirective],
   templateUrl: './nav.html',
+  standalone: true,
   styleUrl: './nav.css'
 })
 export class Nav {

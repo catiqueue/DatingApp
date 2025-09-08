@@ -1,7 +1,7 @@
-@let users = usersCache.users;
-@let pagination = usersCache.pagination;
-@let filter = usersCache.filter;
-@let sortOrder = usersCache.sortOrder;
+@let users = usersService.users;
+@let pagination = usersService.pagination;
+@let filter = usersService.filter;
+@let sortOrder = usersService.sortOrder;
 
 <div class="row">
   <div class="text-center mt-3">
@@ -22,9 +22,9 @@
       <div class="d-flex mx-2">
         <label class="col-form-label">Show: </label>
         <select name="gender" style="width: 130px;" class="form-select ms-1" (change)="onFiltersChanged()" [(ngModel)]="filter().gender">
-          @for(gender of ["male", "female"]; track gender) {
+          @for(gender of ["Male", "Female"]; track gender) {
             <option [value]="gender">
-              {{gender | titlecase}}
+              {{gender}}
             </option>
           }
         </select>

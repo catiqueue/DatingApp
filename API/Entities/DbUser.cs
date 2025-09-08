@@ -18,10 +18,10 @@ public sealed class DbUser : IdentityUser<uint> {
   public string? LookingFor { get; set; }
   public required string City { get; set; }
   public required string Country { get; set; }
-  public List<DbPhoto> Photos { get; set; } = [];
-  public List<DbUserLike> LikedBy { get; set; } = [];
-  public List<DbUserLike> Likes { get; set; } = [];
-  public List<DbMessage> MessagesSent { get; set; } = [];
-  public List<DbMessage> MessagesReceived { get; set; } = [];
-  public List<DbUserRole> UserRoles { get; set; } = [];
+  public ICollection<DbPhoto> Photos { get; set; } = [];
+  public ICollection<DbUserLike> LikedBy { get; set; } = [];
+  public ICollection<DbUserLike> Likes { get; set; } = [];
+  public ICollection<DbMessage> MessagesSent { get; set; } = [];
+  public ICollection<DbMessage> MessagesReceived { get; set; } = [];
+  public ICollection<DbUserRole> UserRoles { get; set; } = [];
 }
