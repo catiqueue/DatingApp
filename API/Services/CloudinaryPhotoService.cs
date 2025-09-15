@@ -1,4 +1,4 @@
-﻿using API.Services.Abstractions.PhotoService;
+﻿using API.Interfaces.PhotoService;
 
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;

@@ -14,8 +14,8 @@ namespace API.Data.Migrations
                 name: "Likes",
                 columns: table => new
                 {
-                    LikingUserId = table.Column<uint>(type: "INTEGER", nullable: false),
-                    LikedUserId = table.Column<uint>(type: "INTEGER", nullable: false)
+                    LikingUserId = table.Column<int>(type: "INTEGER", nullable: false),
+                    LikedUserId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

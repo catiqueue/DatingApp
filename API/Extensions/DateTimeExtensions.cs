@@ -1,7 +1,11 @@
 ﻿namespace API.Extensions;
 
 public static class DateTimeExtensions {
-  // I wanted to make this a one-liner, but it's not very readable 😭😭😭
-  public static uint GetAge(this DateOnly dob, DateOnly now) 
-    => (uint) (now.Year - dob.Year - (now < new DateOnly(now.Year, dob.Month, dob.Day) ? 1 : 0));
+  // if a person's birthday is 2006 and today is 2025,
+  // the age can be 19 or 18, depending on whether they celebrate their birthday this year
+  public static int GetAge(this DateOnly dob, DateOnly now) {
+    int years = now.Year - dob.Year;
+    var birthdayThisYear = new DateOnly(now.Year, dob.Month, dob.Day);
+    return now < birthdayThisYear ? years - 1 : years;
+  }
 }

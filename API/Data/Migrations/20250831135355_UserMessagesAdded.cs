@@ -15,7 +15,7 @@ namespace API.Data.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<uint>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     SenderUsername = table.Column<string>(type: "TEXT", nullable: false),
                     RecipientUsername = table.Column<string>(type: "TEXT", nullable: false),
@@ -24,8 +24,8 @@ namespace API.Data.Migrations
                     SentAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     SenderDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
                     RecipientDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    SenderId = table.Column<uint>(type: "INTEGER", nullable: false),
-                    RecipientId = table.Column<uint>(type: "INTEGER", nullable: false)
+                    SenderId = table.Column<int>(type: "INTEGER", nullable: false),
+                    RecipientId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

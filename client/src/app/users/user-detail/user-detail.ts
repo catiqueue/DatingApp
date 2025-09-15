@@ -83,11 +83,11 @@ export class UserDetail implements OnInit, AfterViewInit, OnDestroy {
     this.cdRef.detectChanges();
   }
 
-  onRouteChanged() {
+  async onRouteChanged() {
     const currentUser = this.accountService.currentUser();
     if(this.messagesService.connectionState === HubConnectionState.Connected
         && this.activeTab?.heading === "Messages" && currentUser) {
-      this.messagesService.closeHubConnection().then(async () => {
+      await this.messagesService.closeHubConnection().then(async () => {
         await this.messagesService.createHubConnection(currentUser, this.user.userName)
       });
     }
@@ -102,11 +102,16 @@ export class UserDetail implements OnInit, AfterViewInit, OnDestroy {
     });
     const currentUser = this.accountService.currentUser();
     if (this.activeTab.heading === "Messages" && this.user && currentUser) {
+      // this is dumb but without these checks the hub connection will be created twice because tab activates twice for some reason
+      if(this.messagesService.connectionState === HubConnectionState.Connected
+        || this.messagesService.connectionState === HubConnectionState.Connecting
+        || this.messagesService.connectionState === HubConnectionState.Reconnecting)
+        return;
       await this.messagesService.createHubConnection(currentUser, this.user.userName);
     } else await this.messagesService.closeHubConnection();
   }
 
-  ngOnDestroy(): void {
-    this.messagesService.closeHubConnection();
+  async ngOnDestroy() {
+    await this.messagesService.closeHubConnection();
   }
 }

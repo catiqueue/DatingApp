@@ -35,7 +35,7 @@ export class MessagesService implements CacheWithGetters<MessagesCacheSchema> {
       })
       .withAutomaticReconnect()
       .build();
-    this.hub.start().catch(err => console.log(err));
+    await this.hub.start().catch(err => console.log(err));
 
     this.hub.on("OnMessageThreadReceived", messages => {
       this.messages.set(messages);
@@ -58,8 +58,8 @@ export class MessagesService implements CacheWithGetters<MessagesCacheSchema> {
   }
 
   public async closeHubConnection() {
-    if(this.hub?.state == HubConnectionState.Connected) {
-      this.hub.stop().catch(err => console.log(err));
+    if(this.hub?.state === HubConnectionState.Connected) {
+      await this.hub.stop().catch(err => console.log(err));
     }
   }
 

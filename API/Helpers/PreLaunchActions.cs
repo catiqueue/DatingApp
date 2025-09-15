@@ -8,14 +8,14 @@ namespace API.Helpers;
 
 public static class PreLaunchActions {
   public static async Task ClearConnections(IServiceScope scope)
-    => await scope.ServiceProvider.GetRequiredService<DataContext>().Connections.ExecuteDeleteAsync();
+    => await scope.ServiceProvider.GetRequiredService<ApiDbContext>().Connections.ExecuteDeleteAsync();
   
   public static async Task ApplyMigrations(IServiceScope scope) 
-    => await scope.ServiceProvider.GetRequiredService<DataContext>().Database.MigrateAsync();
+    => await scope.ServiceProvider.GetRequiredService<ApiDbContext>().Database.MigrateAsync();
   
-  public static Task SeedUsers(IServiceScope scope) 
-    => Seed.SeedUsers(scope.ServiceProvider.GetRequiredService<UserManager<DbUser>>(), 
-                      scope.ServiceProvider.GetRequiredService<RoleManager<DbRole>>());
+  public static async Task SeedUsers(IServiceScope scope) 
+    => await Seed.SeedUsers(scope.ServiceProvider.GetRequiredService<UserManager<User>>(), 
+                      scope.ServiceProvider.GetRequiredService<RoleManager<Role>>());
   
   public static async Task ExecuteAction(this WebApplication app, Func<IServiceScope, Task> action) {
     var scope = app.Services.CreateScope();

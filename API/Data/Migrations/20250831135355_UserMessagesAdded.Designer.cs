@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(ApiDbContext))]
     [Migration("20250831135355_UserMessagesAdded")]
     partial class UserMessagesAdded
     {
@@ -22,7 +22,7 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbMessage", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -36,7 +36,7 @@ namespace API.Data.Migrations
                     b.Property<bool>("RecipientDeleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("RecipientId")
+                    b.Property<int>("RecipientId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("RecipientUsername")
@@ -46,7 +46,7 @@ namespace API.Data.Migrations
                     b.Property<bool>("SenderDeleted")
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("SenderId")
+                    b.Property<int>("SenderId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SenderUsername")
@@ -67,11 +67,11 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbPhoto", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("DbUserId")
+                    b.Property<int>("DbUserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")
@@ -93,7 +93,7 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbUser", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
@@ -150,10 +150,10 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbUserLike", b =>
                 {
-                    b.Property<uint>("LikingUserId")
+                    b.Property<int>("LikingUserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("LikedUserId")
+                    b.Property<int>("LikedUserId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("LikingUserId", "LikedUserId");

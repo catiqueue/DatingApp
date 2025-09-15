@@ -4,15 +4,15 @@ using System.Text;
 
 using API.Entities;
 using API.Extensions.Configuration;
-using API.Services.Abstractions;
+using API.Interfaces;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace API.Services;
 
-public class TokenService(IConfiguration config, UserManager<DbUser> userManager) : ITokenService {
-  public async Task<string> CreateToken(DbUser user) {
+public class TokenService(IConfiguration config, UserManager<User> userManager) : ITokenService {
+  public async Task<string> CreateToken(User user) {
     if(user.UserName is null) throw new ArgumentException("The username is null.", nameof(user));
     var tokenKey = config.GetJwtSymmetricalKey();
     

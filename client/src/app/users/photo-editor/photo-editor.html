@@ -1,10 +1,15 @@
 <div class="row">
   @for(photo of user().photos; track photo.id) {
-    <div class="col-2">
-      <img src="{{photo.url}}" alt="a user-s photo" class="img-thumbnail mb-1">
+    <div class="col-2 img-wrapper">
+      <img src="{{photo.url}}" alt="a user-s photo" class="img-thumbnail p-1" [class.not-approved]="!photo.isApproved">
+      @if(!photo.isApproved) {
+        <div class="text-center img-text">
+          <span class="text-danger">Awaiting approval</span>
+        </div>
+      }
       <div class="text-center">
         <button class="btn btn-sm me-1"
-        [disabled]="photo.isMain"
+        [disabled]="photo.isMain || !photo.isApproved"
         (click)="setMainPhoto(photo)"
         [class]="photo.isMain ? 'btn-success active' : 'btn-outline-success' ">Main</button>
         <button class="btn btn-sm btn-danger" [disabled]="photo.isMain" (click)="deletePhoto(photo)"><i class="fa fa-trash"></i></button>

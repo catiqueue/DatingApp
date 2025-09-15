@@ -38,7 +38,7 @@ export class PhotoEditor implements OnInit {
       next: () => {
         this.accountService.setAvatar(photo);
 
-        var updatedUser =  {...this.user()}
+        const updatedUser = {...this.user()};
         updatedUser.avatarUrl = photo.url;
 
         updatedUser.photos.forEach(ph => {
@@ -54,7 +54,7 @@ export class PhotoEditor implements OnInit {
   deletePhoto(photo: Photo) {
     this.usersService.deletePhoto(photo).subscribe({
       next: () => {
-        var updatedUser = {...this.user()};
+        const updatedUser = {...this.user()};
         updatedUser.photos = updatedUser.photos.filter(ph => ph.id !== photo.id);
         this.userUpdated.emit(updatedUser);
       }
@@ -75,8 +75,8 @@ export class PhotoEditor implements OnInit {
       file.withCredentials = false;
     }
     this.uploader.onSuccessItem = (file, response, status, headers) => {
-      var photo = JSON.parse(response) as Photo;
-      var updatedUser = {...this.user()};
+      const photo = JSON.parse(response) as Photo;
+      const updatedUser = {...this.user()};
       updatedUser.photos.push(photo);
       if(photo.isMain) {
         this.accountService.setAvatar(photo);

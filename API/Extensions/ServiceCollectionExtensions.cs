@@ -2,16 +2,17 @@
 
 public static class ServiceCollectionExtensions {
   public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
-    => services.AddSqliteDbContext(configuration)
+    => services.AddHttpContextAccessor()
+               .AddSqliteDbContext(configuration)
                .AddCors()
                .AddControllers().Services
+               .AddExceptionHandlers()
                .AddServices(configuration)
                .AddRepositories()
                .AddRepositoryFactory()
                .AddUnitOfWork()
                .AddAutoMapper(typeof(Program).Assembly)
                .AddSignalR().Services
-               .AddPresenceTracker()
                .AddUserActivityTracker();
 
   public static IServiceCollection AddIdentityServices(this IServiceCollection services, IConfiguration configuration)

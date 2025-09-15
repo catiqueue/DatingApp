@@ -1,9 +1,9 @@
-﻿using API.Data.Requests;
-using API.Data.Responses;
+﻿using API.DTO.Requests;
+using API.DTO.Responses;
 using API.Entities;
 using API.Extensions;
 using API.Helpers;
-using API.Services.Abstractions;
+using API.Interfaces;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +13,13 @@ namespace API.Controllers;
 [Authorize]
 public class LikesController(IUnitOfWork work) : ApiControllerBase {
   [HttpPost("{liked:int}")]
-  public async Task<ActionResult> ToggleLike(uint liked) {
+  public async Task<ActionResult> ToggleLike(int liked) {
     var liking = User.GetId();
     
     if(liking == liked) return BadRequest("You can't like yourself. (sorry)");
 
-    if (await work.Likes.GetDbLikeAsync(liking, liked) is not { } existingLike) {
-      work.Likes.AddLike(new DbUserLike { LikingUserId = liking, LikedUserId = liked });
+    if (await work.Likes.GetLikeAsync(liking, liked) is not { } existingLike) {
+      work.Likes.AddLike(new UserLike { LikingUserId = liking, LikedUserId = liked });
     } else {
       work.Likes.DeleteLike(existingLike);
     }
@@ -28,15 +28,15 @@ public class LikesController(IUnitOfWork work) : ApiControllerBase {
   }
   
   [HttpGet("list")]
-  public async Task<ActionResult<IEnumerable<uint>>> GetLikedUserIds() => Ok(await work.Likes.GetUsersLikedIdsAsync(User.GetId()));
+  public async Task<ActionResult<IEnumerable<int>>> GetLikedUserIds() => Ok(await work.Likes.GetUsersLikedIdsAsync(User.GetId()));
   
   [HttpGet]
-  public async Task<ActionResult<PaginatedResponse<SimpleUser>>> GetLikeList([FromQuery] GetLikedListRequest request) 
+  public async Task<ActionResult<PaginatedResponseDto<UserDto>>> GetLikeList([FromQuery] GetLikedListRequest request) 
     => PaginationInfo.TryCreate(request.ToPage(), await work.Likes.CountAsync(request.Predicate, User.GetId()), out var paginationInfo) 
-      ? Ok(PaginatedResponse<SimpleUser>.FromPaginationInfo(
+      ? Ok(PaginatedResponseDto<UserDto>.FromPaginationInfo(
           paginationInfo,
-          await work.Likes.GetSimpleUserLikedListAsync(request.ToPage(), request.Predicate, User.GetId()))) 
+          await work.Likes.GetUserDtoLikedListAsync(request.ToPage(), request.Predicate, User.GetId()))) 
       : request.PageNumber == 1
-        ? Ok(PaginatedResponse<SimpleUser>.Empty(request.PageSize))
+        ? Ok(PaginatedResponseDto<UserDto>.Empty(request.PageSize))
         : BadRequest($"Page {request.PageNumber} does not exist.");
 }

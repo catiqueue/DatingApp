@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-using API.Errors;
+using API.DTO.Responses;
 
 namespace API.Middleware;
 
@@ -17,8 +17,8 @@ public class ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddlewa
       context.Response.ContentType = "application/json";
       context.Response.StatusCode = 500;
       var response = env.IsDevelopment() 
-        ? new ApiError(context.Response.StatusCode, e.Message, e.StackTrace) 
-        : new ApiError(context.Response.StatusCode, e.Message, "Internal Server Error");
+        ? new ApiErrorResponse(context.Response.StatusCode, e.Message, e.StackTrace) 
+        : new ApiErrorResponse(context.Response.StatusCode, e.Message, "Internal Server Error");
       
       var json = JsonSerializer.Serialize(response, SerializerOptions);
       await context.Response.WriteAsync(json);

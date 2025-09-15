@@ -1,1 +1,24 @@
-<p>photo-management works!</p>
+<div class='row'>
+  @for (photo of adminService.photos(); track photo.id) {
+    <div class='col-sm-2'>
+      <img src='{{photo.url}}' class='img-thumbnail p-1'
+           alt='A moderated photo'>
+      <div class='text-center'>
+        <button class='btn btn-sm btn-success me-1'
+                (click)='approvePhoto(photo.id)'>Approve</button>
+        <button class='btn btn-sm btn-danger'
+                (click)='rejectPhoto(photo.id)'>Reject</button>
+      </div>
+    </div>
+  }
+</div>
+
+@if(adminService.pagination()?.totalCount) {
+  <div class="d-flex justify-content-center mt-3">
+    <pagination [boundaryLinks]="true" [totalItems]="adminService.pagination()!.totalCount"
+                [itemsPerPage]="adminService.pagination()!.current.pageSize" [maxSize]="10"
+                (pageChanged)="onPageChanged($event)" [(ngModel)]="adminService.pagination()!.current.pageNumber"
+                previousText="&lsaquo;" nextText="&rsaquo;"
+                firstText="&laquo;" lastText="&raquo;"></pagination>
+  </div>
+}

@@ -1,5 +1,5 @@
 ﻿using API.Extensions;
-using API.Services.Abstractions.Repositories;
+using API.Interfaces.Repositories;
 
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -12,6 +12,6 @@ public class UserActivityTracker : IAsyncActionFilter {
     if (!context.HttpContext.User.Identity?.IsAuthenticated ?? true) return;
     var id = result.HttpContext.User.GetId();
     var repo = result.HttpContext.RequestServices.GetRequiredService<IUserRepository>();
-    await repo.UpdateLastActiveAsync(id);
+    await repo.ExecuteUpdateLastActiveAsync(id);
   }
 }

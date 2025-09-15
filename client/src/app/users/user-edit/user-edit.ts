@@ -33,9 +33,9 @@ export class UserEdit implements OnInit {
   }
 
   loadUser() {
-    var user = this.accountService.currentUser();
-    if(!user) return;
-    this.userService.getUserByUsername(user.userName).subscribe({
+    const account = this.accountService.currentUser();
+    if(!account) return;
+    this.userService.getUserByUsername(account.userName).subscribe({
       next: user => { this.user.set(user); console.log(user); }
     });
   }

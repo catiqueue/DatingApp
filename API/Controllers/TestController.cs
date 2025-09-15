@@ -17,7 +17,7 @@ public class TestController : ApiControllerBase {
   public ActionResult<string> GetSecret() => "A secret key";
   
   [HttpGet("not-found")]
-  public ActionResult<DbUser> GetNotFound() => NotFound();
+  public ActionResult<User> GetNotFound() => NotFound();
   
   [HttpGet("bad-request")]
   public ActionResult<string> GetBadRequest() => BadRequest("This was not a good request.");

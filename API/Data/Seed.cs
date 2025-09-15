@@ -10,16 +10,16 @@ namespace API.Data;
 public static class Seed {
   private static readonly JsonSerializerOptions SerializerOptions = new() { PropertyNameCaseInsensitive = true };
   
-  public static async Task SeedUsers(UserManager<DbUser> userManager, RoleManager<DbRole> roleManager) {
+  public static async Task SeedUsers(UserManager<User> userManager, RoleManager<Role> roleManager) {
     if (await userManager.Users.AnyAsync()) return;
     
     var data = await File.ReadAllTextAsync("Data/UserSeedData.json");
-    var users = JsonSerializer.Deserialize<List<DbUser>>(data, SerializerOptions) ?? [];
-    var roles = new DbRole[] { new() { Name = "User" }, new() { Name = "Admin" }, new() { Name = "Moderator" } };
-    var admin = new DbUser {
+    var users = JsonSerializer.Deserialize<List<User>>(data, SerializerOptions) ?? [];
+    var roles = new Role[] { new() { Name = "User" }, new() { Name = "Admin" }, new() { Name = "Moderator" } };
+    var admin = new User {
       UserName = "admin",
       KnownAs = "Admin",
-      Gender = UserGender.Other,
+      Gender = Gender.None,
       City = "New York",
       Country = "United States"
     };
@@ -31,7 +31,7 @@ public static class Seed {
 
     return;
     
-    async Task CreateWithRoles(DbUser user, IEnumerable<string> roles) {
+    async Task CreateWithRoles(User user, IEnumerable<string> roles) {
       await userManager.CreateAsync(user, "Pa$$w0rd");
       await userManager.AddToRolesAsync(user, roles);
     }

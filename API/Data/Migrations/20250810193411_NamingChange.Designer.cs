@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(ApiDbContext))]
     [Migration("20250810193411_NamingChange")]
     partial class NamingChange
     {
@@ -22,11 +22,11 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbPhoto", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<uint>("DbUserId")
+                    b.Property<int>("DbUserId")
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("IsMain")
@@ -48,7 +48,7 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.DbUser", b =>
                 {
-                    b.Property<uint>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 

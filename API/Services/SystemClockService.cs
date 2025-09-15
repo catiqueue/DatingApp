@@ -1,4 +1,4 @@
-﻿using API.Services.Abstractions;
+﻿using API.Interfaces;
 
 namespace API.Services;
 

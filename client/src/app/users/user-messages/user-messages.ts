@@ -17,8 +17,8 @@ export class UserMessagesComponent implements AfterViewChecked {
   protected messagesService = inject(MessagesService);
   protected messageContent: string = "";
 
-  public sendMessage() {
-    this.messagesService.sendMessage(this.username(), this.messageContent)
+  public async sendMessage() {
+    await this.messagesService.sendMessage(this.username(), this.messageContent)
       .then(() => {
         this.messageForm?.reset();
         this.scrollToBottom();
