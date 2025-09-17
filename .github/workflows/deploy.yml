@@ -1,0 +1,49 @@
+name: Build container image and deploy to Host
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU (if multi-arch) and Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push app image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/datingapp:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/datingapp:latest
+
+      - name: Prepare SSH agent
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - name: Trigger remote deploy
+        run: |
+          ssh -o StrictHostKeyChecking=no deploy@${{ secrets.HOST }} "bash -s" <<'EOF'
+            cd /home/deploy/dating-app || exit 1
+            ./deploy.sh ${{ github.sha }}
+          EOF
