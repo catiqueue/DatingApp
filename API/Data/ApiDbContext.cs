@@ -27,8 +27,8 @@ public sealed class ApiDbContext(DbContextOptions<ApiDbContext> settings, IHttpC
       .IsRequired()
       .OnDelete(DeleteBehavior.Cascade);
     
-    builder.Entity<User>()
-      .HasQueryFilter(user => user.NormalizedUserName != "ADMIN");
+    // builder.Entity<User>()
+    //   .HasQueryFilter(user => user.NormalizedUserName != "ADMIN");
     
     builder.Entity<Photo>()
       .HasOne(photo => photo.User)
@@ -52,9 +52,9 @@ public sealed class ApiDbContext(DbContextOptions<ApiDbContext> settings, IHttpC
       .HasForeignKey(join => join.RoleId)
       .IsRequired();
     
-    builder.Entity<User>()
-      .Property(u => u.Gender)
-      .HasConversion(new EnumToStringConverter<Gender>());
+    // builder.Entity<User>()
+    //   .Property(u => u.Gender)
+    //   .HasConversion(new EnumToStringConverter<Gender>());
 
     builder.Entity<UserLike>()
       .HasKey(k => new { k.LikingUserId, k.LikedUserId });

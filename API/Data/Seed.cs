@@ -26,8 +26,11 @@ public static class Seed {
     
     foreach (var role in roles) 
       await roleManager.CreateAsync(role);
-    foreach (var user in users.Concat([admin])) 
+    foreach (var user in users.Concat([admin])) {
+      user.CreatedAt = DateTime.SpecifyKind(user.CreatedAt, DateTimeKind.Utc);
+      user.LastActive = DateTime.SpecifyKind(user.LastActive, DateTimeKind.Utc);
       await CreateWithRoles(user, user.UserName == "admin" ? ["Admin", "Moderator"] : ["User"]);
+    }
 
     return;
     

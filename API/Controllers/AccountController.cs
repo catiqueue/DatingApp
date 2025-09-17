@@ -30,7 +30,7 @@ public sealed class AccountController(UserManager<User> userManager, ITokenServi
   
   [HttpPost("login")]
   public async Task<ActionResult<AuthenticatedUserDto>> Handle(LoginRequest request) {
-    if (await userManager.Users.Include(user => user.Photos)
+    if (await userManager.Users.IgnoreQueryFilters().Include(user => user.Photos)
           .FirstOrDefaultAsync(user => user.NormalizedUserName == userManager.NormalizeName(request.Username))
         is not { } user)
       return Unauthorized("The username was not found.");
@@ -40,5 +40,5 @@ public sealed class AccountController(UserManager<User> userManager, ITokenServi
       : Ok(AuthenticatedUserDto.FromDbUser(user, await tokenSvc.CreateToken(user)));
   }
   
-  private async Task<bool> UserExistsAsync(string username) => await userManager.Users.AnyAsync(u => u.NormalizedUserName == userManager.NormalizeName(username));
+  private async Task<bool> UserExistsAsync(string username) => await userManager.Users.IgnoreQueryFilters().AnyAsync(u => u.NormalizedUserName == userManager.NormalizeName(username));
 }

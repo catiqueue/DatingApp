@@ -3,7 +3,8 @@
 public static class ServiceCollectionExtensions {
   public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     => services.AddHttpContextAccessor()
-               .AddSqliteDbContext(configuration)
+               .AddPostgreSqlDbContext(configuration)
+               // .AddSqliteDbContext(configuration)
                .AddCors()
                .AddControllers().Services
                .AddExceptionHandlers()

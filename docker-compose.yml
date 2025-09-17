@@ -1,0 +1,48 @@
+﻿services:
+  api:
+    build: .
+    environment:
+      - ConnectionStrings__PostgreSqlConnection=Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASS}
+      - TokenKey=${APP_TOKEN_KEY}
+      - CloudinarySettings__CloudName=${CLOUDINARY_CLOUD_NAME}
+      - CloudinarySettings__ApiKey=${CLOUDINARY_API_KEY}
+      - CloudinarySettings__ApiSecret=${CLOUDINARY_API_SECRET}
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    ports:
+      - "5000:80"
+      - "5001:443"
+      - "8080:8080"
+    networks:
+      - backend
+    volumes:
+      - app-data-protection-keys:/root/.aspnet/DataProtection-Keys
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - app-db:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: always
+    
+volumes:
+  app-db: 
+    driver: local
+  app-data-protection-keys:
+    driver: local
+
+networks:
+  backend:
+    driver: bridge

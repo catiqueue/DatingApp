@@ -16,6 +16,7 @@ public static class UserFilters {
     return query;
   }
 
+  private static IEnumerable<string> InternalUsernames { get; } = ["admin"];  
   private static IQueryable<User> FilterGender(this IQueryable<User> query, Gender requestedGender) 
     => query.Where(u => u.Gender == requestedGender);
   private static IQueryable<User> FilterMinAge(this IQueryable<User> query, int minAge) 
@@ -23,5 +24,5 @@ public static class UserFilters {
   private static IQueryable<User> FilterMaxAge(this IQueryable<User> query, int maxAge) 
     => query.Where(u => u.DateOfBirth >= DateOnly.FromDateTime(DateTime.UtcNow).AddYears(-maxAge-1));
   private static IQueryable<User> SkipUsernames(this IQueryable<User> query, IEnumerable<string> skippedUsernames) 
-    => query.Where(u => !skippedUsernames.Select(uname => uname.ToUpperInvariant()).Contains(u.NormalizedUserName));
+    => query.Where(u => !skippedUsernames.Concat(InternalUsernames).Select(uname => uname.ToUpperInvariant()).Contains(u.NormalizedUserName));
 }

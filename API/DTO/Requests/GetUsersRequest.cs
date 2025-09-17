@@ -5,9 +5,9 @@ namespace API.DTO.Requests;
 
 public sealed class GetUsersRequest : PaginatedRequestBase {
   public UserSortOrder? OrderBy { get; set; }
-  private Gender? Gender { get; set; }
-  private int? MinAge { get; set; }
-  private int? MaxAge { get; set; }
+  public Gender? Gender { get; set; }
+  public int? MinAge { get; set; }
+  public int? MaxAge { get; set; }
   
   public UserFilter ToFilter(string initiatorUsername) => new(Gender, MinAge, MaxAge, [initiatorUsername]);
 }

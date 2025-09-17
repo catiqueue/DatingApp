@@ -12,6 +12,12 @@ public static class ConfigurationExtensions {
     => configuration.GetSection(Selectors.SqliteConnectionSelector).Value 
        ?? throw new InvalidOperationException($"Missing configuration value: {Selectors.SqliteConnectionSelector}");
   
+  public static string GetPostgreSqlConnectionString(this IConfiguration configuration) 
+    => configuration.GetSection(Selectors.PostgreSqlConnectionSelector).Value 
+       ?? throw new InvalidOperationException($"Missing configuration value: {Selectors.PostgreSqlConnectionSelector}");
+  
+  
+  
   public static IConfigurationSection GetCloudinarySection(this IConfiguration configuration) 
     => configuration.GetSection(Selectors.CloudinarySettingsSelector);
 }
